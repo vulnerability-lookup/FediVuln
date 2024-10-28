@@ -42,7 +42,6 @@ class VulnStreamListener(StreamListener):
         if vulnerability_ids:
             print("Vulnerability IDs detected:")
             print("Vulnerability IDs found:", ", ".join(vulnerability_ids))
-            print(status)  # Prints the full status
             if self.sighting:
                 push_to_vulnerability_lookup(
                     vulnerability_ids
@@ -73,21 +72,22 @@ def push_to_vulnerability_lookup(vulnerability_ids):
         "accept": "application/json",
         "X-API-KEY": f"{config.vulnerability_auth_token}",
     }
-    sighting = {"type": "seen", "vulnerability": vulnerability_ids[0]}
-    try:
-        r = requests.post(
-            urllib.parse.urljoin(config.vulnerability_lookup_base_url, "sighting/"),
-            json=sighting,
-            headers=headers_json,
-        )
-        if r.status_code not in (200, 201):
-            print(
-                f"Error when sending POST request to the Vulnerability Lookup server: {r.reason}"
+    for vuln in vulnerability_ids:
+        sighting = {"type": "seen", "vulnerability": vuln}
+        try:
+            r = requests.post(
+                urllib.parse.urljoin(config.vulnerability_lookup_base_url, "sighting/"),
+                json=sighting,
+                headers=headers_json,
             )
-    except requests.exceptions.ConnectionError as e:
-        print(
-            f"Error when sending POST request to the Vulnerability Lookup server:\n{e}"
-        )
+            if r.status_code not in (200, 201):
+                print(
+                    f"Error when sending POST request to the Vulnerability Lookup server: {r.reason}"
+                )
+        except requests.exceptions.ConnectionError as e:
+            print(
+                f"Error when sending POST request to the Vulnerability Lookup server:\n{e}"
+            )
 
 
 def main():
