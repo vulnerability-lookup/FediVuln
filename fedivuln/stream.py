@@ -38,7 +38,7 @@ class VulnStreamListener(StreamListener):
         vulnerability_ids = [
             match for match_tuple in matches for match in match_tuple if match
         ]
-        vulnerability_ids = list(set(vulnerability_ids))
+        vulnerability_ids = remove_case_insensitive_duplicates(vulnerability_ids)
         if vulnerability_ids:
             print("Vulnerability IDs detected:")
             print("Vulnerability IDs found:", ", ".join(vulnerability_ids))
@@ -62,6 +62,15 @@ class VulnStreamListener(StreamListener):
     # Handle any errors in streaming
     def on_abort(self, err):
         print("Stream aborted with error:", err)
+
+
+def remove_case_insensitive_duplicates(input_list):
+    """Remove duplicates in a list, ignoring case.
+    This approach preserves the last occurrence of each unique item based on
+    lowercase equivalence. The dictionary keys are all lowercase to ensure
+    case-insensitive comparison, while the original case is preserved in the output.
+    """
+    return list({item.lower(): item for item in input_list}.values())
 
 
 def push_to_vulnerability_lookup(vulnerability_ids):
