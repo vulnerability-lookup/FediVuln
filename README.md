@@ -8,7 +8,6 @@ A client to gather vulnerability-related information from the Fediverse.
 
 ```bash
 $ poetry install
-$ poetry shell
 $ cp config.py.sample config.py
 ```
 
@@ -21,7 +20,8 @@ Set the configuration variables in config.py as appropriate for your environment
 ### Register your application
 
 ```bash
-$ python register.py
+$ poetry shell
+$ FediVuln-Register
 ```
 
 This script uses OAuth in order to retrieve the access token. This is achieved in several steps.
@@ -35,15 +35,16 @@ This script uses OAuth in order to retrieve the access token. This is achieved i
 You only have to execute it once.
 
 
-## Streaming
+### Streaming
 
 
 ```bash
+$ poetry shell
 $ FediVuln-Stream --user
 ```
 
 
-## Publishing
+### Publishing
 
 ```bash
 $ python publish.py

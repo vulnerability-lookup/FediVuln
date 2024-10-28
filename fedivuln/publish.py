@@ -16,8 +16,7 @@ def publish(message):
     mastodon.status_post(message)
 
 
-if __name__ == "__main__":
-    # Point of entry in execution mode.
+def main():
     parser = argparse.ArgumentParser(prog="FediVuln-Publish")
     parser.add_argument(
         "-i",
@@ -30,3 +29,8 @@ if __name__ == "__main__":
     arguments = parser.parse_args()
 
     publish(arguments.message)
+
+
+if __name__ == "__main__":
+    # Point of entry in execution mode.
+    main()

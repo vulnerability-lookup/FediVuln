@@ -27,7 +27,9 @@ classifiers = [
 
 
 [tool.poetry.scripts]
+FediVuln-Register = "fedivuln.register:main"
 FediVuln-Stream = "fedivuln.stream:main"
+FediVuln-Publish = "fedivuln.publish:main"
 
 
 [tool.poetry.dependencies]
