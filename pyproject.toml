@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "FediVuln"
+version = "0.1.0"
+description = "A client to gather vulnerability-related information from the Fediverse."
+authors = ["Cédric Bonhomme <cedric@cedricbonhomme.org>"]
+license = "GPL-3.0-or-later"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+mastodon-py = "^1.8.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
