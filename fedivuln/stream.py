@@ -38,6 +38,7 @@ class VulnStreamListener(StreamListener):
         vulnerability_ids = [
             match for match_tuple in matches for match in match_tuple if match
         ]
+        vulnerability_ids = list(set(vulnerability_ids))
         if vulnerability_ids:
             print("Vulnerability IDs detected:")
             print("Vulnerability IDs found:", ", ".join(vulnerability_ids))

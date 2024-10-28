@@ -55,7 +55,7 @@ $ python publish.py
 
 ## License
 
-This software is licensed under
+[FediVuln](https://github.com/CIRCL/FediVuln) is licensed under
 [GNU General Public License version 3](https://www.gnu.org/licenses/gpl-3.0.html)
 
 ~~~
