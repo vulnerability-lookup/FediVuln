@@ -31,11 +31,13 @@ class VulnStreamListener(StreamListener):
     def on_update(self, status):
         print("New status received.")
         content = status["content"]
-        vulnerability_ids = self.vulnerability_pattern.findall(
+        matches = self.vulnerability_pattern.findall(
             content
         )  # Find all matches in the content
-        # Filter out empty matches and print any found IDs
-        vulnerability_ids = [match for match in vulnerability_ids if match]
+        # Flatten the list of tuples to get only non-empty matched strings
+        vulnerability_ids = [
+            match for match_tuple in matches for match in match_tuple if match
+        ]
         if vulnerability_ids:
             print("Vulnerability IDs detected:")
             print("Vulnerability IDs found:", ", ".join(vulnerability_ids))
