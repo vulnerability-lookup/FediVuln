@@ -13,8 +13,8 @@ $ cp config.py.sample config.py
 
 Set the configuration variables in config.py as appropriate for your environment:
 
-- Mastodon instance URL.
-- Vulnerability Lookup API root and authentication token.
+- the Mastodon instance URL.
+- optionally, the Vulnerability Lookup API root and authentication token.
 
 
 ### Register your application
@@ -43,7 +43,9 @@ $ poetry shell
 $ FediVuln-Stream --user --sighting
 ```
 
-Using the ``--sighting`` argument, detected vulnerability IDs will be recorded in Vulnerability Lookup as sightings.
+Using the ``--sighting`` argument, detected vulnerability IDs will be recorded in
+[Vulnerability Lookup](https://github.com/cve-search/vulnerability-lookup) as
+[sightings](https://vulnerability-lookup.readthedocs.io/en/latest/sightings.html).
 
 
 ### Publishing
