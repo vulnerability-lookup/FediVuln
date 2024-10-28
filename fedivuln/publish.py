@@ -1,6 +1,6 @@
 import argparse
 
-from mastodon import Mastodon  # type: ignore[import-untyped]
+from mastodon import Mastodon
 
 from fedivuln import config
 

@@ -1,8 +1,10 @@
 import argparse
 import re
 import sys
+import urllib.parse
 
-from mastodon import Mastodon, StreamListener  # type: ignore[import-untyped]
+import requests
+from mastodon import Mastodon, StreamListener
 
 from fedivuln import config
 
@@ -15,24 +17,33 @@ mastodon = Mastodon(
 
 # Listener class for handling stream events
 class VulnStreamListener(StreamListener):
-    # Regular expression to match CVE, GHSA, and PySec IDs
-    cve_pattern = re.compile(r"\bCVE-\d{4}-\d{4,}\b", re.IGNORECASE)
-    ghsa_pattern = re.compile(
-        r"GHSA-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}", re.IGNORECASE
-    )
-    pysec_pattern = re.compile(r"PYSEC-\d{4}-\d{2,5}", re.IGNORECASE)
+    def __init__(self, sighting: bool = False):
+        # Regular expression to match CVE, GHSA, and PySec IDs
+        self.vulnerability_pattern = re.compile(
+            r"\b(CVE-\d{4}-\d{4,})\b"  # CVE pattern
+            r"|\b(GHSA-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4})\b"  # GHSA pattern
+            r"|\b(PYSEC-\d{4}-\d{2,5})\b",  # PYSEC pattern
+            re.IGNORECASE,
+        )
+        self.sighting = sighting
 
     # When a new status (post) is received
     def on_update(self, status):
         print("New status received.")
         content = status["content"]
-        if (
-            self.cve_pattern.search(content)
-            or self.ghsa_pattern.search(content)
-            or self.pysec_pattern.search(content)
-        ):
-            print("Vulnerability detected:")
-            print(status)  # Prints the full HTML content of the status
+        vulnerability_ids = self.vulnerability_pattern.findall(
+            content
+        )  # Find all matches in the content
+        # Filter out empty matches and print any found IDs
+        vulnerability_ids = [match for match in vulnerability_ids if match]
+        if vulnerability_ids:
+            print("Vulnerability IDs detected:")
+            print("Vulnerability IDs found:", ", ".join(vulnerability_ids))
+            print(status)  # Prints the full status
+            if self.sighting:
+                push_to_vulnerability_lookup(
+                    vulnerability_ids
+                )  # Push a sighting to Vulnerability Lookup
         else:
             print("Ignoring.")
 
@@ -51,8 +62,29 @@ class VulnStreamListener(StreamListener):
         print("Stream aborted with error:", err)
 
 
-# Instantiate the listener
-listener = VulnStreamListener()
+def push_to_vulnerability_lookup(vulnerability_ids):
+    """Create a sighting from an incoming status and push it to the Vulnerability Lookup instance."""
+    print("Pushing sighting to Vulnerability Lookup...")
+    headers_json = {
+        "Content-Type": "application/json",
+        "accept": "application/json",
+    }
+    sighting = {"type": "seen", "vulnerability": vulnerability_ids[0]}
+    try:
+        r = requests.post(
+            urllib.parse.urljoin(config.vulnerability_lookup_base_url, "sighting/"),
+            json=sighting,
+            headers=headers_json,
+            auth=("admin", "token"),
+        )
+        if r.status_code not in (200, 201):
+            print(
+                f"Error when sending POST request to the Vulnerability Lookup server: {r.reason}"
+            )
+    except requests.exceptions.ConnectionError as e:
+        print(
+            f"Error when sending POST request to the Vulnerability Lookup server:\n{e}"
+        )
 
 
 def main():
@@ -67,8 +99,16 @@ def main():
         action="store_true",
         help="Streams public events.",
     )
+    parser.add_argument(
+        "--sighting",
+        action="store_true",
+        help="Push the sightings to Vulnerability Lookup.",
+    )
 
     arguments = parser.parse_args()
+
+    # Instantiate the listener
+    listener = VulnStreamListener(sighting=arguments.sighting)
 
     if arguments.user:
         print("Starting user stream...")

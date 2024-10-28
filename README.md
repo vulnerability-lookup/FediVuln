@@ -40,8 +40,10 @@ You only have to execute it once.
 
 ```bash
 $ poetry shell
-$ FediVuln-Stream --user
+$ FediVuln-Stream --user --sighting
 ```
+
+Using the ``--sighting`` argument, detected vulnerability IDs will be recorded in Vulnerability Lookup as sightings.
 
 
 ### Publishing
