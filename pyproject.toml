@@ -6,11 +6,58 @@ authors = ["Cédric Bonhomme <cedric@cedricbonhomme.org>"]
 license = "GPL-3.0-or-later"
 readme = "README.md"
 
+homepage = "https://github.com/CIRCL/FediVuln"
+repository = "https://github.com/CIRCL/FediVuln"
+
+keywords = ["vulnerability", "cve", "fediverse", "mastodon"]
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Security",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"
+]
+
+
 [tool.poetry.dependencies]
 python = "^3.10"
 mastodon-py = "^1.8.1"
 
 
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.13.0"
+flake8 = "^6.0.0"
+pre-commit = "^4.0.1"
+
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.mypy]
+python_version = "3.13"
+check_untyped_defs = true
+ignore_errors = false
+ignore_missing_imports = true
+strict_optional = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unused_configs = true
+warn_unreachable = true
+
+show_error_context = true
+pretty = true
+
+exclude = "build|dist|docs|stegano.egg-info"
+
+[tool.isort]
+profile = "black"
