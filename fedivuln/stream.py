@@ -68,6 +68,7 @@ def push_to_vulnerability_lookup(vulnerability_ids):
     headers_json = {
         "Content-Type": "application/json",
         "accept": "application/json",
+        "X-API-KEY": f" {config.vulnerability_auth_token}",
     }
     sighting = {"type": "seen", "vulnerability": vulnerability_ids[0]}
     try:
@@ -75,7 +76,6 @@ def push_to_vulnerability_lookup(vulnerability_ids):
             urllib.parse.urljoin(config.vulnerability_lookup_base_url, "sighting/"),
             json=sighting,
             headers=headers_json,
-            auth=("admin", "token"),
         )
         if r.status_code not in (200, 201):
             print(
