@@ -1,14 +1,17 @@
+import argparse
 import re
+import sys
+
 from mastodon import Mastodon, StreamListener  # type: ignore[import-untyped]
 
 from fedivuln import config
-
 
 mastodon = Mastodon(
     client_id="mastodon_clientcred.secret",
     access_token="mastodon_usercred.secret",
     api_base_url=config.api_base_url,
 )
+
 
 # Listener class for handling stream events
 class VulnStreamListener(StreamListener):
@@ -21,7 +24,7 @@ class VulnStreamListener(StreamListener):
 
     # When a new status (post) is received
     def on_update(self, status):
-        print("New status received:")
+        print("New status received.")
         content = status["content"]
         if (
             self.cve_pattern.search(content)
@@ -52,8 +55,32 @@ class VulnStreamListener(StreamListener):
 listener = VulnStreamListener()
 
 
-print("Starting user stream...")
-mastodon.stream_user(listener)
+def main():
+    parser = argparse.ArgumentParser(prog="FediVuln-Stream")
+    parser.add_argument(
+        "--user",
+        action="store_true",
+        help="Streams events that are relevant to the authorized user, i.e. home timeline and notifications.",
+    )
+    parser.add_argument(
+        "--public",
+        action="store_true",
+        help="Streams public events.",
+    )
 
-# print("Starting local public strean...")
-# mastodon.stream_public(listener, remote=True)
+    arguments = parser.parse_args()
+
+    if arguments.user:
+        print("Starting user stream...")
+        mastodon.stream_user(listener)
+    elif arguments.public:
+        print("Starting local public stream...")
+        mastodon.stream_public(listener, remote=True)
+    else:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    # Point of entry in execution mode.
+    main()

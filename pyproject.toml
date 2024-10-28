@@ -26,6 +26,10 @@ classifiers = [
 ]
 
 
+[tool.poetry.scripts]
+FediVuln-Stream = "fedivuln.stream:main"
+
+
 [tool.poetry.dependencies]
 python = "^3.10"
 mastodon-py = "^1.8.1"
@@ -57,7 +61,7 @@ warn_unreachable = true
 show_error_context = true
 pretty = true
 
-exclude = "build|dist|docs|stegano.egg-info"
+exclude = "build|dist|docs|fedivuln.egg-info"
 
 [tool.isort]
 profile = "black"

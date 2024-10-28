@@ -7,6 +7,8 @@ A client to gather vulnerability-related information from the Fediverse.
 ### Configuration
 
 ```bash
+$ poetry install
+$ poetry shell
 $ cp config.py.sample config.py
 ```
 
@@ -37,7 +39,7 @@ You only have to execute it once.
 
 
 ```bash
-$ python stream.py
+$ FediVuln-Stream --user
 ```
 
 
@@ -46,3 +48,14 @@ $ python stream.py
 ```bash
 $ python publish.py
 ```
+
+
+## License
+
+This software is licensed under
+[GNU General Public License version 3](https://www.gnu.org/licenses/gpl-3.0.html)
+
+~~~
+Copyright (c) 2024 Computer Incident Response Center Luxembourg (CIRCL)
+Copyright (C) 2024 Cédric Bonhomme - https://github.com/cedricbonhomme
+~~~

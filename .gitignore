@@ -34,5 +34,5 @@ eproject.cfg
 *.log
 
 fedivuln/config.py
-fedivuln/mastodon_clientcred.secret
-fedivuln/mastodon_usercred.secret
+mastodon_clientcred.secret
+mastodon_usercred.secret

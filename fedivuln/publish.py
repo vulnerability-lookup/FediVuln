@@ -1,4 +1,3 @@
-
 import argparse
 
 from mastodon import Mastodon  # type: ignore[import-untyped]
@@ -29,6 +28,5 @@ if __name__ == "__main__":
     )
 
     arguments = parser.parse_args()
-
 
     publish(arguments.message)
