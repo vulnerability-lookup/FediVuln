@@ -40,8 +40,7 @@ class VulnStreamListener(StreamListener):
         ]
         vulnerability_ids = remove_case_insensitive_duplicates(vulnerability_ids)
         if vulnerability_ids:
-            print("Vulnerability IDs detected:")
-            print("Vulnerability IDs found:", ", ".join(vulnerability_ids))
+            print("Vulnerability IDs detected:", ", ".join(vulnerability_ids))
             if self.sighting:
                 push_to_vulnerability_lookup(
                     status["uri"], vulnerability_ids
