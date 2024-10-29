@@ -30,6 +30,9 @@ class VulnStreamListener(StreamListener):
     # When a new status (post) is received
     def on_update(self, status):
         print("New status received.")
+        if status["edited_at"] is not None:
+            print("Edit of a previous status. Ignoring.")
+            return
         content = status["content"]
         matches = self.vulnerability_pattern.findall(
             content
@@ -46,7 +49,7 @@ class VulnStreamListener(StreamListener):
                     status["uri"], vulnerability_ids
                 )  # Push a sighting to Vulnerability Lookup
         else:
-            print("Ignoring.")
+            print("No ID detected. Ignoring.")
 
     # When a new notification is received (e.g., mention, follow, boost, favorite)
     def on_notification(self, notification):
