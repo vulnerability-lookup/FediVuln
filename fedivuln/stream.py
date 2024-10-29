@@ -44,7 +44,7 @@ class VulnStreamListener(StreamListener):
             print("Vulnerability IDs found:", ", ".join(vulnerability_ids))
             if self.sighting:
                 push_to_vulnerability_lookup(
-                    vulnerability_ids
+                    status["uri"], vulnerability_ids
                 )  # Push a sighting to Vulnerability Lookup
         else:
             print("Ignoring.")
@@ -73,7 +73,7 @@ def remove_case_insensitive_duplicates(input_list):
     return list({item.lower(): item for item in input_list}.values())
 
 
-def push_to_vulnerability_lookup(vulnerability_ids):
+def push_to_vulnerability_lookup(status_uri, vulnerability_ids):
     """Create a sighting from an incoming status and push it to the Vulnerability Lookup instance."""
     print("Pushing sighting to Vulnerability Lookup...")
     headers_json = {
@@ -82,7 +82,7 @@ def push_to_vulnerability_lookup(vulnerability_ids):
         "X-API-KEY": f"{config.vulnerability_auth_token}",
     }
     for vuln in vulnerability_ids:
-        sighting = {"type": "seen", "vulnerability": vuln}
+        sighting = {"type": "seen", "source": status_uri, "vulnerability": vuln}
         try:
             r = requests.post(
                 urllib.parse.urljoin(config.vulnerability_lookup_base_url, "sighting/"),
