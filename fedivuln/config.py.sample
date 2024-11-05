@@ -1,7 +1,0 @@
-
-
-api_base_url = "https://social.circl.lu" # Mastodon instance URL
-scopes=["read", "write", "follow", "push"] # Ensure required scopes here
-
-vulnerability_lookup_base_url = "https://vulnerability.circl.lu/api/"
-vulnerability_auth_token = ""

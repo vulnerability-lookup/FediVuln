@@ -6,19 +6,19 @@ from fedivuln import config
 def main():
     # Step 1: Register the application with Mastodon instance, including all necessary scopes
     Mastodon.create_app(
-        "Vulnerability-Lookup",
+        config.app_name,
         api_base_url=config.api_base_url,
-        to_file="mastodon_clientcred.secret",
+        to_file=config.mastodon_clientcred,
         scopes=config.scopes,
     )
 
     # Step 2: Instantiate Mastodon client with client credentials
-    mastodon = Mastodon(client_id="mastodon_clientcred.secret")
+    mastodon = Mastodon(client_id=config.mastodon_clientcred)
 
     # Step 3: Log in - Generate authorization URL with the exact same scopes
     login_url = mastodon.auth_request_url(
-        client_id="mastodon_clientcred.secret",
-        scopes=["read", "write", "follow", "push"],  # Match scopes here
+        client_id=config.mastodon_clientcred,
+        scopes=config.scopes,  # Match scopes here
         redirect_uris="urn:ietf:wg:oauth:2.0:oob",
     )
     print("Go to this URL to authorize: ", login_url)
@@ -29,8 +29,8 @@ def main():
     # Step 5: Use the authorization code to retrieve the access token, with the same scopes
     mastodon.log_in(
         code=authorization_code,
-        scopes=["read", "write", "follow", "push"],  # Match scopes here
-        to_file="mastodon_usercred.secret",
+        scopes=config.scopes,  # Match scopes here
+        to_file=config.mastodon_usercred,
     )
 
     # Example API call: Fetch the authenticated user's profile

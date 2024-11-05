@@ -4,17 +4,15 @@ A client to gather vulnerability-related information from the Fediverse.
 
 ## Usage
 
-### Configuration
+### Installation
 
 ```bash
-$ poetry install
-$ cp config.py.sample config.py
+$ pipx install FediVuln
+$ export FEDIVULN_CONFIG=~/.FediVuln/conf.py
 ```
 
-Set the configuration variables in config.py as appropriate for your environment:
-
-- the Mastodon instance URL.
-- optionally, the Vulnerability Lookup API root and authentication token.
+Set the configuration variables in ``conf.cfg`` as appropriate for your environment.
+An [example is provided](fedivuln/conf.cfg-sample).
 
 
 ### Register your application

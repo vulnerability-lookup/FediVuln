@@ -26,6 +26,14 @@ classifiers = [
 ]
 
 
+include = [
+    "README.md",
+    "COPYING",
+    "COPYING",
+    "fedivuln/conf.cfg-sample",
+]
+
+
 [tool.poetry.scripts]
 FediVuln-Register = "fedivuln.register:main"
 FediVuln-Stream = "fedivuln.stream:main"

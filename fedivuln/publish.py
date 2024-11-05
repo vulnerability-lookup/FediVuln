@@ -6,8 +6,8 @@ from fedivuln import config
 
 # Set up your Mastodon instance with access credentials
 mastodon = Mastodon(
-    client_id="mastodon_clientcred.secret",
-    access_token="mastodon_usercred.secret",
+    client_id=config.mastodon_clientcred,
+    access_token=config.mastodon_usercred,
     api_base_url=config.api_base_url,
 )
 

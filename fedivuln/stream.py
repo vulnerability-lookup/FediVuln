@@ -8,9 +8,11 @@ from mastodon import Mastodon, StreamListener
 
 from fedivuln import config
 
+# print(config.api_base_url)
+
 mastodon = Mastodon(
-    client_id="mastodon_clientcred.secret",
-    access_token="mastodon_usercred.secret",
+    client_id=config.mastodon_clientcred,
+    access_token=config.mastodon_usercred,
     api_base_url=config.api_base_url,
 )
 

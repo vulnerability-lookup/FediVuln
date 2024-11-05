@@ -33,6 +33,6 @@ eproject.cfg
 # Log files:
 *.log
 
-fedivuln/config.py
+fedivuln/conf.py
 mastodon_clientcred.secret
 mastodon_usercred.secret
