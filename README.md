@@ -6,19 +6,23 @@ A client to gather vulnerability-related information from the Fediverse.
 
 ### Installation
 
+[pipx](https://github.com/pypa/pipx) is an easy way to install and run Python applications in isolated environments.
+It's easy to [install](https://github.com/pypa/pipx?tab=readme-ov-file#on-linux).
+
 ```bash
 $ pipx install FediVuln
 $ export FEDIVULN_CONFIG=~/.FediVuln/conf.py
 ```
 
-Set the configuration variables in ``conf.cfg`` as appropriate for your environment.
-An [example is provided](fedivuln/conf.cfg-sample).
+The configuration for FediVuln should be defined in a Python file (e.g., ``~/.FediVuln/conf.py``).
+You must then set an environment variable (``FEDIVULN_CONFIG``) with the full path to this file.
+
+You can have a look at [this example](https://github.com/CIRCL/FediVuln/blob/main/fedivuln/conf_sample.py) of configuration.
 
 
 ### Register your application
 
 ```bash
-$ poetry shell
 $ FediVuln-Register
 ```
 
@@ -37,7 +41,6 @@ You only have to execute it once.
 
 
 ```bash
-$ poetry shell
 $ FediVuln-Stream --user --sighting
 ```
 
@@ -47,6 +50,8 @@ Using the ``--sighting`` argument, detected vulnerability IDs will be recorded i
 
 
 ### Publishing
+
+WIP.
 
 ```bash
 $ python publish.py
