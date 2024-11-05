@@ -30,7 +30,7 @@ include = [
     "README.md",
     "COPYING",
     "COPYING",
-    "fedivuln/conf.cfg-sample",
+    "fedivuln/conf_sample.py",
 ]
 
 
