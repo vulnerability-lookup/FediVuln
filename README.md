@@ -60,10 +60,6 @@ With ``--push-status`` argument, the full JSON status object will be sent to the
 Vulnerability Lookup instance and stored in the kvrocks database.
 
 
-
-
-
-
 ### Publishing
 
 WIP.
