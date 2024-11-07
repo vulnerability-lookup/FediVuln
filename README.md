@@ -39,10 +39,18 @@ You only have to execute it once.
 
 ### Streaming
 
+Streams events that are relevant to the authorized user, i.e. home timeline and notifications:
 
 ```bash
 $ FediVuln-Stream --user --push-sighting
 ```
+
+If you want to get the stream of public events (local server + connected servers):
+
+```bash
+$ FediVuln-Stream --public --push-sighting
+```
+
 
 Using the ``--push-sighting`` argument, detected vulnerability IDs will be recorded in
 [Vulnerability Lookup](https://github.com/cve-search/vulnerability-lookup) as
@@ -50,6 +58,10 @@ Using the ``--push-sighting`` argument, detected vulnerability IDs will be recor
 
 With ``--push-status`` argument, the full JSON status object will be sent to the
 Vulnerability Lookup instance and stored in the kvrocks database.
+
+
+
+
 
 
 ### Publishing

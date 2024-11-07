@@ -183,7 +183,7 @@ def main():
         mastodon.stream_user(listener)
     elif arguments.public:
         print("Starting Mastodon local public stream...")
-        mastodon.stream_public(listener, remote=True)
+        mastodon.stream_public(listener)
     else:
         parser.print_help(sys.stderr)
         sys.exit(1)
