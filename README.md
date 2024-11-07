@@ -41,12 +41,15 @@ You only have to execute it once.
 
 
 ```bash
-$ FediVuln-Stream --user --sighting
+$ FediVuln-Stream --user --push-sighting
 ```
 
-Using the ``--sighting`` argument, detected vulnerability IDs will be recorded in
+Using the ``--push-sighting`` argument, detected vulnerability IDs will be recorded in
 [Vulnerability Lookup](https://github.com/cve-search/vulnerability-lookup) as
 [sightings](https://vulnerability-lookup.readthedocs.io/en/latest/sightings.html).
+
+With ``--push-status`` argument, the full JSON status object will be sent to the
+Vulnerability Lookup instance and stored in the kvrocks database.
 
 
 ### Publishing
