@@ -149,7 +149,9 @@ def push_status_to_vulnerability_lookup(status, vulnerability_ids):
 
 
 def main():
-    parser = argparse.ArgumentParser(prog="FediVuln-Stream")
+    parser = argparse.ArgumentParser(
+        prog="FediVuln-Stream", description="Allows access to the streaming API."
+    )
     parser.add_argument(
         "--user",
         action="store_true",

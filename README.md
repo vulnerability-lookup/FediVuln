@@ -39,6 +39,23 @@ You only have to execute it once.
 
 ### Streaming
 
+#### Usage
+
+```bash
+usage: FediVuln-Stream [-h] [--user] [--public] [--push-sighting] [--push-status]
+
+Allows access to the streaming API.
+
+options:
+  -h, --help       show this help message and exit
+  --user           Streams events that are relevant to the authorized user, i.e. home timeline and notifications.
+  --public         Streams public events.
+  --push-sighting  Push the sightings to Vulnerability Lookup.
+  --push-status    Push the status to Vulnerability Lookup.
+```
+
+#### Examples
+
 Streams events that are relevant to the authorized user, i.e. home timeline and notifications:
 
 ```bash
@@ -51,13 +68,27 @@ If you want to get the stream of public events (local server + connected servers
 $ FediVuln-Stream --public --push-sighting
 ```
 
-
 Using the ``--push-sighting`` argument, detected vulnerability IDs will be recorded in
 [Vulnerability Lookup](https://github.com/cve-search/vulnerability-lookup) as
 [sightings](https://vulnerability-lookup.readthedocs.io/en/latest/sightings.html).
 
 With ``--push-status`` argument, the full JSON status object will be sent to the
 Vulnerability Lookup instance and stored in the kvrocks database.
+
+
+### Search
+
+#### Usage
+
+```bash
+usage: FediVuln-Search [-h] --query QUERY
+
+Allows you to search for users, tags and, when enabled, full text, by default within your own posts and those you have interacted with.
+
+options:
+  -h, --help     show this help message and exit
+  --query QUERY  Query of the search.
+```
 
 
 ### Publishing
