@@ -9,7 +9,7 @@ readme = "README.md"
 homepage = "https://github.com/CIRCL/FediVuln"
 repository = "https://github.com/CIRCL/FediVuln"
 
-keywords = ["vulnerability", "cve", "fediverse", "mastodon"]
+keywords = ["Vulnerability-Lookup", "Vulnerability", "CVE", "Fediverse", "Mastodon"]
 
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -25,14 +25,11 @@ classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"
 ]
 
-
 include = [
     "README.md",
     "COPYING",
-    "COPYING",
     "fedivuln/conf_sample.py",
 ]
-
 
 [tool.poetry.scripts]
 FediVuln-Register = "fedivuln.register:main"
@@ -40,11 +37,9 @@ FediVuln-Stream = "fedivuln.stream:main"
 FediVuln-Search = "fedivuln.search:main"
 FediVuln-Publish = "fedivuln.publish:main"
 
-
 [tool.poetry.dependencies]
 python = "^3.10"
 mastodon-py = "^1.8.1"
-
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.13.0"
@@ -52,11 +47,9 @@ flake8 = "^6.0.0"
 pre-commit = "^4.0.1"
 types-requests = "^2.32.0.20241016"
 
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
 
 [tool.mypy]
 python_version = "3.13"
