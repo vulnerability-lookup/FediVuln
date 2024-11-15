@@ -2,9 +2,7 @@
 
 A client to gather vulnerability-related information from the Fediverse.
 
-## Usage
-
-### Installation
+## Installation
 
 [pipx](https://github.com/pypa/pipx) is an easy way to install and run Python applications in isolated environments.
 It's easy to [install](https://github.com/pypa/pipx?tab=readme-ov-file#on-linux).
@@ -19,6 +17,8 @@ You must then set an environment variable (``FEDIVULN_CONFIG``) with the full pa
 
 You can have a look at [this example](https://github.com/CIRCL/FediVuln/blob/main/fedivuln/conf_sample.py) of configuration.
 
+
+## Usage
 
 ### Register your application
 
