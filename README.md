@@ -1,6 +1,9 @@
 # FediVuln
 
 A client to gather vulnerability-related information from the Fediverse.
+The gathered data is subsequently transmitted to the
+[Vulnerability-Lookup](https://github.com/cve-search/vulnerability-lookup) API.
+
 
 ## Installation
 
@@ -39,7 +42,6 @@ You only have to execute it once.
 
 ### Streaming
 
-#### Usage
 
 ```bash
 usage: FediVuln-Stream [-h] [--user] [--public] [--push-sighting] [--push-status]
@@ -77,8 +79,6 @@ Vulnerability Lookup instance and stored in the kvrocks database.
 
 
 ### Search
-
-#### Usage
 
 ```bash
 usage: FediVuln-Search [-h] --query QUERY
