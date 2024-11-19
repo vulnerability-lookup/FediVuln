@@ -40,6 +40,7 @@ FediVuln-Publish = "fedivuln.publish:main"
 [tool.poetry.dependencies]
 python = "^3.10"
 mastodon-py = "^1.8.1"
+pyvulnerabilitylookup = "^2.1.0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.13.0"

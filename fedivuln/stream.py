@@ -7,6 +7,7 @@ from datetime import datetime
 
 import requests
 from mastodon import Mastodon, StreamListener
+from pyvulnerabilitylookup import PyVulnerabilityLookup
 
 from fedivuln import config
 
@@ -98,24 +99,17 @@ def remove_case_insensitive_duplicates(input_list):
 def push_sighting_to_vulnerability_lookup(status_uri, vulnerability_ids):
     """Create a sighting from an incoming status and push it to the Vulnerability Lookup instance."""
     print("Pushing sighting to Vulnerability Lookup...")
-    headers_json = {
-        "Content-Type": "application/json",
-        "accept": "application/json",
-        "X-API-KEY": f"{config.vulnerability_auth_token}",
-    }
+    vuln_lookup = PyVulnerabilityLookup(
+        config.vulnerability_lookup_base_url, token=config.vulnerability_auth_token
+    )
     for vuln in vulnerability_ids:
+        # Create the sighting
         sighting = {"type": "seen", "source": status_uri, "vulnerability": vuln}
+
+        # Post the JSON to Vulnerability Lookup
         try:
-            r = requests.post(
-                urllib.parse.urljoin(config.vulnerability_lookup_base_url, "sighting/"),
-                json=sighting,
-                headers=headers_json,
-            )
-            if r.status_code not in (200, 201):
-                print(
-                    f"Error when sending POST request to the Vulnerability Lookup server: {r.reason}"
-                )
-        except requests.exceptions.ConnectionError as e:
+            vuln_lookup.create_sighting(sighting=sighting)
+        except Exception as e:
             print(
                 f"Error when sending POST request to the Vulnerability Lookup server:\n{e}"
             )
