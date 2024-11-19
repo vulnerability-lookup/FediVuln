@@ -2,10 +2,8 @@ import argparse
 import json
 import re
 import sys
-import urllib.parse
 from datetime import datetime
 
-import requests
 from mastodon import Mastodon, StreamListener
 from pyvulnerabilitylookup import PyVulnerabilityLookup
 
@@ -29,7 +27,7 @@ mastodon = Mastodon(
 
 # Listener class for handling stream events
 class VulnStreamListener(StreamListener):
-    def __init__(self, push_sighting: bool = False, push_status: bool = False):
+    def __init__(self, push_sighting: bool = False):
         # Regular expression to match CVE, GHSA, and PySec IDs
         self.vulnerability_pattern = re.compile(
             r"\b(CVE-\d{4}-\d{4,})\b"  # CVE pattern
@@ -42,7 +40,6 @@ class VulnStreamListener(StreamListener):
             re.IGNORECASE,
         )
         self.push_sighting = push_sighting
-        self.push_status = push_status
 
     # When a new status (post) is received
     def on_update(self, status):
@@ -65,10 +62,10 @@ class VulnStreamListener(StreamListener):
                 push_sighting_to_vulnerability_lookup(
                     status["uri"], vulnerability_ids
                 )  # Push the sighting to Vulnerability Lookup
-            if self.push_status:
-                push_status_to_vulnerability_lookup(
-                    status, vulnerability_ids
-                )  # Push the status to Vulnerability Lookup
+            # if self.push_status:
+            #     push_status_to_vulnerability_lookup(
+            #         status, vulnerability_ids
+            #     )  # Push the status to Vulnerability Lookup
         else:
             print("No ID detected. Ignoring.")
 
@@ -115,31 +112,31 @@ def push_sighting_to_vulnerability_lookup(status_uri, vulnerability_ids):
             )
 
 
-def push_status_to_vulnerability_lookup(status, vulnerability_ids):
-    """Push the status to the Vulnerability Lookup instance."""
-    print("Pushing status to Vulnerability Lookup...")
-    headers_json = {
-        "Content-Type": "application/json",
-        "accept": "application/json",
-        "X-API-KEY": f"{config.vulnerability_auth_token}",
-    }
-    # status = convert_datetime(status)
-    json_payload = {"status": status, "vulnerability_ids": vulnerability_ids}
-    json_string = json.dumps(json_payload, cls=DateTimeEncoder)
-    try:
-        r = requests.post(
-            urllib.parse.urljoin(config.vulnerability_lookup_base_url, "status/"),
-            data=json_string,
-            headers=headers_json,
-        )
-        if r.status_code not in (200, 201):
-            print(
-                f"Error when sending POST request to the Vulnerability Lookup server: {r.reason}"
-            )
-    except requests.exceptions.ConnectionError as e:
-        print(
-            f"Error when sending POST request to the Vulnerability Lookup server:\n{e}"
-        )
+# def push_status_to_vulnerability_lookup(status, vulnerability_ids):
+#     """Push the status to the Vulnerability Lookup instance."""
+#     print("Pushing status to Vulnerability Lookup...")
+#     headers_json = {
+#         "Content-Type": "application/json",
+#         "accept": "application/json",
+#         "X-API-KEY": f"{config.vulnerability_auth_token}",
+#     }
+#     # status = convert_datetime(status)
+#     json_payload = {"status": status, "vulnerability_ids": vulnerability_ids}
+#     json_string = json.dumps(json_payload, cls=DateTimeEncoder)
+#     try:
+#         r = requests.post(
+#             urllib.parse.urljoin(config.vulnerability_lookup_base_url, "status/"),
+#             data=json_string,
+#             headers=headers_json,
+#         )
+#         if r.status_code not in (200, 201):
+#             print(
+#                 f"Error when sending POST request to the Vulnerability Lookup server: {r.reason}"
+#             )
+#     except requests.exceptions.ConnectionError as e:
+#         print(
+#             f"Error when sending POST request to the Vulnerability Lookup server:\n{e}"
+#         )
 
 
 def main():
@@ -161,18 +158,16 @@ def main():
         action="store_true",
         help="Push the sightings to Vulnerability Lookup.",
     )
-    parser.add_argument(
-        "--push-status",
-        action="store_true",
-        help="Push the status to Vulnerability Lookup.",
-    )
+    # parser.add_argument(
+    #     "--push-status",
+    #     action="store_true",
+    #     help="Push the status to Vulnerability Lookup.",
+    # )
 
     arguments = parser.parse_args()
 
     # Instantiate the listener
-    listener = VulnStreamListener(
-        push_sighting=arguments.push_sighting, push_status=arguments.push_status
-    )
+    listener = VulnStreamListener(push_sighting=arguments.push_sighting)
 
     if arguments.user:
         print("Starting Mastodon user stream...")
