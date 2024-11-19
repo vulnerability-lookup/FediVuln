@@ -105,7 +105,9 @@ def push_sighting_to_vulnerability_lookup(status_uri, vulnerability_ids):
 
         # Post the JSON to Vulnerability Lookup
         try:
-            vuln_lookup.create_sighting(sighting=sighting)
+            r = vuln_lookup.create_sighting(sighting=sighting)
+            if "message" in r:
+                print(r["message"])
         except Exception as e:
             print(
                 f"Error when sending POST request to the Vulnerability Lookup server:\n{e}"
