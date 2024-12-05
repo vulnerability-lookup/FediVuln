@@ -104,14 +104,6 @@ options:
 ```
 
 
-### Publishing
-
-WIP.
-
-```bash
-$ python publish.py
-```
-
 
 ## License
 
