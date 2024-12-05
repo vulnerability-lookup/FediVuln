@@ -95,7 +95,7 @@ def remove_case_insensitive_duplicates(input_list):
 
 def push_sighting_to_vulnerability_lookup(status_uri, vulnerability_ids):
     """Create a sighting from an incoming status and push it to the Vulnerability Lookup instance."""
-    print("Pushing sighting to Vulnerability Lookup...")
+    print("Pushing sighting to Vulnerability Lookup…")
     vuln_lookup = PyVulnerabilityLookup(
         config.vulnerability_lookup_base_url, token=config.vulnerability_auth_token
     )
@@ -116,7 +116,7 @@ def push_sighting_to_vulnerability_lookup(status_uri, vulnerability_ids):
 
 # def push_status_to_vulnerability_lookup(status, vulnerability_ids):
 #     """Push the status to the Vulnerability Lookup instance."""
-#     print("Pushing status to Vulnerability Lookup...")
+#     print("Pushing status to Vulnerability Lookup…")
 #     headers_json = {
 #         "Content-Type": "application/json",
 #         "accept": "application/json",
@@ -172,10 +172,10 @@ def main():
     listener = VulnStreamListener(push_sighting=arguments.push_sighting)
 
     if arguments.user:
-        print("Starting Mastodon user stream...")
+        print("Starting Mastodon user stream…")
         mastodon.stream_user(listener)
     elif arguments.public:
-        print("Starting Mastodon local public stream...")
+        print("Starting Mastodon local public stream…")
         mastodon.stream_public(listener)
     else:
         parser.print_help(sys.stderr)

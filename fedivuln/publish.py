@@ -9,9 +9,16 @@ from mastodon import Mastodon
 from fedivuln import config
 
 # Set up your Mastodon instance with access credentials
+if config.mastodon_clientcred_push and config.mastodon_usercred_push:
+    client_id = config.mastodon_clientcred_push
+    access_token = config.mastodon_usercred_push
+else:
+    client_id = config.mastodon_clientcred
+    access_token = config.mastodon_usercred
+
 mastodon = Mastodon(
-    client_id=config.mastodon_clientcred,
-    access_token=config.mastodon_usercred,
+    client_id=client_id,
+    access_token=access_token,
     api_base_url=config.api_base_url,
 )
 
@@ -61,7 +68,7 @@ def listen_to_http_event_stream(url, headers=None, params=None, topic="comment")
         params (dict): Optional query parameters for the request.
     """
     try:
-        print("Connecting to stream. Listening for events...\n")
+        print("Connecting to stream. Listening for events…")
         # Open a streaming connection
         with requests.get(url, headers=headers, params=params, stream=True) as response:
             # Force the headers to be fetched immediately
@@ -99,7 +106,7 @@ def listen_to_http_event_stream(url, headers=None, params=None, topic="comment")
 
 
 def main():
-    # Point of entry in execution mode
+    """Parsing of arguments."""
     parser = argparse.ArgumentParser(prog="FediVuln-Publish")
     parser.add_argument(
         "-t",
