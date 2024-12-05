@@ -1,5 +1,8 @@
 import argparse
+import json
+from urllib.parse import urljoin
 
+import requests
 from mastodon import Mastodon
 
 from fedivuln import config
@@ -16,19 +19,69 @@ def publish(message):
     mastodon.status_post(message)
 
 
+def listen_to_http_event_stream(url, headers=None, params=None):
+    """
+    Connects to a text/event-stream endpoint and displays incoming messages, including multiline data.
+
+    Args:
+        url (str): The URL of the event-stream endpoint.
+        headers (dict): Optional headers for the request.
+        params (dict): Optional query parameters for the request.
+    """
+    try:
+        print("Connecting to stream. Listening for events...\n")
+        # Open a streaming connection
+        with requests.get(url, headers=headers, params=params, stream=True) as response:
+            # Force the headers to be fetched immediately
+            response.raise_for_status()  # Raise an error for non-200 responses
+
+            # Accumulate data for multiline messages
+            event_data = []
+
+            for line in response.iter_lines(decode_unicode=True):
+                if line:  # Non-empty line
+                    if line.startswith("data:"):
+                        # Remove "data:" and accumulate the rest of the line
+                        event_data.append(line[5:].strip())
+                    elif line.startswith("event:"):
+                        event_type = line[6:].strip()
+                        print(f"Event type: {event_type}")
+                else:  # Empty line indicates the end of an event
+                    if event_data:
+                        # Join all accumulated lines into a single string
+                        full_data = "\n".join(event_data)
+                        try:
+                            # Try to parse as JSON if possible
+                            message = json.loads(full_data)
+                            print(f"Received JSON message: {message}")
+                        except json.JSONDecodeError:
+                            # Fallback to plain text
+                            print(f"Received plain message: {full_data}")
+
+                    # Reset accumulator for the next event
+                    event_data = []
+
+    except Exception as e:
+        print(f"Error: {e}")
+
+
 def main():
     parser = argparse.ArgumentParser(prog="FediVuln-Publish")
     parser.add_argument(
-        "-i",
-        "--input",
-        dest="message",
-        required=True,
-        help="Message to post.",
+        "-t",
+        "--topic",
+        dest="topic",
+        default="comment",
+        choices=["vulnerability", "comment", "bundle", "sighting"],
+        help="The topic to subscribe to.",
     )
 
     arguments = parser.parse_args()
 
-    publish(arguments.message)
+    combined = urljoin(config.vulnerability_lookup_base_url, "pubsub/subscribe/")
+    full_url = urljoin(combined, arguments.topic)
+    # headers = {"X-API-KEY": "YOUR_TOKEN"}
+    listen_to_http_event_stream(full_url)
 
 
 if __name__ == "__main__":

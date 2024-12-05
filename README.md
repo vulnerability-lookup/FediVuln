@@ -42,6 +42,7 @@ You only have to execute it once.
 
 ### Streaming
 
+``FediVuln-Stream`` streams data from the Fediverse and uses PyVulnerabilityLookup to create sightings in Vulnerability-Lookup.
 
 ```bash
 usage: FediVuln-Stream [-h] [--user] [--public] [--push-sighting] [--push-status]
@@ -73,6 +74,21 @@ $ FediVuln-Stream --public --push-sighting
 Using the ``--push-sighting`` argument, detected vulnerability IDs will be recorded in
 [Vulnerability Lookup](https://github.com/cve-search/vulnerability-lookup) as
 [sightings](https://vulnerability-lookup.readthedocs.io/en/latest/sightings.html).
+
+
+### Publishing
+
+``FediVuln-Publish`` subscribes to an HTTP or Redis event stream and publishes the incoming data to the Fediverse.
+
+```bash
+$ FediVuln-Publish --help
+usage: FediVuln-Publish [-h] [-t {vulnerability,comment,bundle,sighting}]
+
+options:
+  -h, --help            show this help message and exit
+  -t, --topic {vulnerability,comment,bundle,sighting}
+                        The topic to subscribe to.
+```
 
 
 ### Search
