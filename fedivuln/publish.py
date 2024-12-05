@@ -30,7 +30,7 @@ TEMPLATES = {
 
 def create_status_content(event_data: dict[str, Any], topic: str) -> str:
     """Generates a status update for posting based on the monitored topic."""
-    status = TEMPLATES[topic]
+    status = TEMPLATES.get(topic, "")
     match topic:
         case "vulnerability":
             status = status.replace("<VULNID>", event_data["payload"]["vulnerability"])
@@ -47,7 +47,7 @@ def create_status_content(event_data: dict[str, Any], topic: str) -> str:
 # ### Streaming functions
 
 
-def publish(message):
+def publish(message: str) -> None:
     mastodon.status_post(message)
 
 
