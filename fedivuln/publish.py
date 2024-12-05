@@ -1,5 +1,6 @@
 import argparse
 import json
+from typing import Any
 from urllib.parse import urljoin
 
 import requests
@@ -22,9 +23,25 @@ TEMPLATES = {
     "<VULNID> in Vulnerability-Lookup:\n<LINK>\n\n#VulnerabilityLookup #Vulnerability",
     "comment": "Vulnerability <VULNID> has received a comment on "
     "Vulnerability-Lookup:\n<LINK>\n\n#VulnerabilityLookup #Vulnerability",
-    "bundle": "A new bundle of vulnerabilities has been published "
+    "bundle": "A new bundle, <BUNDLETITLE>, has been published "
     "on Vulnerability-Lookup:\n<LINK>\n\n#VulnerabilityLookup #Vulnerability",
 }
+
+
+def create_status_content(event_data: dict[str, Any], topic: str) -> str:
+    """Generates a status update for posting based on the monitored topic."""
+    status = TEMPLATES[topic]
+    match topic:
+        case "vulnerability":
+            status = status.replace("<VULNID>", event_data["payload"]["vulnerability"])
+        case "comment":
+            status = status.replace("<VULNID>", event_data["payload"]["vulnerability"])
+        case "bundle":
+            status = status.replace("<BUNDLETITLE>", event_data["payload"]["name"])
+        case _:
+            pass
+    status = status.replace("<LINK>", event_data["uri"])
+    return status
 
 
 # ### Streaming functions
@@ -34,7 +51,7 @@ def publish(message):
     mastodon.status_post(message)
 
 
-def listen_to_http_event_stream(url, headers=None, params=None):
+def listen_to_http_event_stream(url, headers=None, params=None, topic="comment"):
     """
     Connects to a text/event-stream endpoint and displays incoming messages, including multiline data.
 
@@ -69,6 +86,7 @@ def listen_to_http_event_stream(url, headers=None, params=None):
                             # Try to parse as JSON if possible
                             message = json.loads(full_data)
                             print(f"Received JSON message: {message}")
+                            publish(create_status_content(message, topic))
                         except json.JSONDecodeError:
                             # Fallback to plain text
                             print(f"Received plain message: {full_data}")
@@ -97,7 +115,7 @@ def main():
     combined = urljoin(config.vulnerability_lookup_base_url, "pubsub/subscribe/")
     full_url = urljoin(combined, arguments.topic)
     # headers = {"X-API-KEY": "YOUR_TOKEN"}
-    listen_to_http_event_stream(full_url)
+    listen_to_http_event_stream(full_url, topic=arguments.topic)
 
 
 if __name__ == "__main__":
