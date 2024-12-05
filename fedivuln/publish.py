@@ -15,6 +15,21 @@ mastodon = Mastodon(
 )
 
 
+# ### Templates
+
+TEMPLATES = {
+    "vulnerability": "You can now share your thoughts on vulnerability "
+    "<VULNID> in Vulnerability-Lookup:\n<LINK>\n\n#VulnerabilityLookup #Vulnerability",
+    "comment": "Vulnerability <VULNID> has received a comment on "
+    "Vulnerability-Lookup:\n<LINK>\n\n#VulnerabilityLookup #Vulnerability",
+    "bundle": "A new bundle of vulnerabilities has been published "
+    "on Vulnerability-Lookup:\n<LINK>\n\n#VulnerabilityLookup #Vulnerability",
+}
+
+
+# ### Streaming functions
+
+
 def publish(message):
     mastodon.status_post(message)
 
@@ -66,6 +81,7 @@ def listen_to_http_event_stream(url, headers=None, params=None):
 
 
 def main():
+    # Point of entry in execution mode
     parser = argparse.ArgumentParser(prog="FediVuln-Publish")
     parser.add_argument(
         "-t",
