@@ -121,8 +121,8 @@ def main():
 
     combined = urljoin(config.vulnerability_lookup_base_url, "pubsub/subscribe/")
     full_url = urljoin(combined, arguments.topic)
-    # headers = {"X-API-KEY": "YOUR_TOKEN"}
-    listen_to_http_event_stream(full_url, topic=arguments.topic)
+    headers = {"X-API-KEY": config.vulnerability_auth_token}
+    listen_to_http_event_stream(full_url, headers=headers, topic=arguments.topic)
 
 
 if __name__ == "__main__":
