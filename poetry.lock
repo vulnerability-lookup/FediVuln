@@ -438,13 +438,13 @@ files = [
 
 [[package]]
 name = "pyvulnerabilitylookup"
-version = "2.1.0"
+version = "2.2.0"
 description = "Python CLI and module for Vulnerability Lookup"
 optional = false
 python-versions = "<4.0,>=3.10"
 files = [
-    {file = "pyvulnerabilitylookup-2.1.0-py3-none-any.whl", hash = "sha256:03ceb06363e280ba0a695b1e1688567d7aa7a73fbfc8af0561902f0ccba136dd"},
-    {file = "pyvulnerabilitylookup-2.1.0.tar.gz", hash = "sha256:d2b8989e136ae478db4502731f2e52a45987e8f2ba71250f2116ec32878d0d7e"},
+    {file = "pyvulnerabilitylookup-2.2.0-py3-none-any.whl", hash = "sha256:27acef0e4fb1fad301c1a4c403de0fe6f06dcd2d12234eb2f63d2f737a7475a7"},
+    {file = "pyvulnerabilitylookup-2.2.0.tar.gz", hash = "sha256:cdf56157cf9df013e2131ed3c03029e9e9be9211d4cf4097b2999448b6d6fec3"},
 ]
 
 [package.dependencies]

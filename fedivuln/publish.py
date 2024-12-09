@@ -86,9 +86,9 @@ def listen_to_http_event_stream(url, headers=None, params=None, topic="comment")
                     try:
                         # Attempt to parse the data as JSON
                         message = json.loads(data_line)
-                        # print("Received JSON message:")
-                        # print(message)
-                        publish(create_status_content(message, topic))
+                        print("Received JSON message:")
+                        print(message)
+                        # publish(create_status_content(message, topic))
                     except json.JSONDecodeError:
                         # Handle plain text messages
                         print(f"Received plain message: {data_line}")
