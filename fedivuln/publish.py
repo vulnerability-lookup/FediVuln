@@ -60,64 +60,44 @@ def publish(message: str) -> None:
 
 def listen_to_http_event_stream(url, headers=None, params=None, topic="comment"):
     """
-    Connects to a text/event-stream endpoint and displays incoming messages.
+    Connects to a text/event-stream endpoint and processes incoming messages.
 
     Args:
         url (str): The URL of the event-stream endpoint.
         headers (dict): Optional headers for the request.
         params (dict): Optional query parameters for the request.
-        topic (str): Topic for creating status content (optional).
+        topic (str): Topic for filtering or processing messages (optional).
     """
     try:
-        # Open a streaming connection
-        with requests.get(url, headers=headers, params=params, stream=True) as response:
+        print("Connecting to the event stream...")
+        with requests.get(
+            url, headers=headers, params=params, stream=True, timeout=None
+        ) as response:
             if response.status_code != 200:
                 print(f"Error: Received status code {response.status_code}")
                 return
 
-            print("Connected to stream. Listening for events...\n")
-
-            # Accumulate data for multiline messages
-            # event_data = []
-            # event_type = None
+            print(f"Connected to the topic '{topic}'. Listening for events...\n")
 
             for line in response.iter_lines(decode_unicode=True):
-                if line:
-                    if line.startswith("data:"):
-                        data = line[5:].strip()
-                        message = json.loads(data)
+                if line.startswith("data:"):
+                    # Extract and process the data part
+                    data_line = line[5:].strip()
+                    try:
+                        # Attempt to parse the data as JSON
+                        message = json.loads(data_line)
+                        print("Received JSON message:")
                         print(message)
-                        # publish(create_status_content(message, topic))
-                # if line:  # Non-empty line
-                #     if line.startswith("data:"):
-                #         # Remove "data:" and accumulate the rest of the line
-                #         event_data.append(line[5:].strip())
-                #     elif line.startswith("event:"):
-                #         # Capture the event type
-                #         event_type = line[6:].strip()
-                #     elif line.startswith(":"):
-                #         # Skip comment lines (lines starting with ':')
-                #         continue
-                # else:  # Empty line indicates the end of an event
-                #     if event_data:
-                #         # Join all accumulated lines into a single string
-                #         full_data = "\n".join(event_data)
-                #         try:
-                #             # Try to parse as JSON if possible
-                #             message = json.loads(full_data)
-                #             #print(f"Event Type: {event_type if event_type else 'default'}")
-                #             #print(f"Received JSON message: {message}")
-                #             # publish(create_status_content(message, topic))
-                #         except json.JSONDecodeError:
-                #             # Fallback to plain text
-                #             pass
-                #             #print(f"Received plain message: {full_data}")
+                    except json.JSONDecodeError:
+                        # Handle plain text messages
+                        print(f"Received plain message: {data_line}")
 
-                #         # Reset accumulator for the next event
-                #         event_data = []
-                #         event_type = None
+    except requests.exceptions.RequestException as req_err:
+        print(f"Request error: {req_err}")
+    except KeyboardInterrupt:
+        print("\nStream interrupted by user. Closing connection.")
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Unexpected error: {e}")
 
 
 def main():
