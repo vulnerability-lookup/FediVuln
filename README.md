@@ -90,6 +90,15 @@ options:
                         The topic to subscribe to.
 ```
 
+The authentication to the HTTP event stream is automatically handled by PyVulnerabilityLookup.
+
+For each incoming event, a status will be posted using the configured Mastodon account.
+The format of the status is dynamically tailored to the specific event topic.
+For instance, executing the command ``FediVuln-Publish -t comment`` will capture all
+new comments and share a human-readable summary on the Fediverse, including a link to the
+original comment on the Vulnerability-Lookup instance.
+
+
 
 ### Search
 
