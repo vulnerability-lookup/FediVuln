@@ -69,7 +69,7 @@ def listen_to_http_event_stream(url, headers=None, params=None, topic="comment")
         topic (str): Topic for filtering or processing messages (optional).
     """
     try:
-        print("Connecting to the event stream...")
+        print("Connecting to the event stream…")
         with requests.get(
             url, headers=headers, params=params, stream=True, timeout=None
         ) as response:
@@ -77,7 +77,7 @@ def listen_to_http_event_stream(url, headers=None, params=None, topic="comment")
                 print(f"Error: Received status code {response.status_code}")
                 return
 
-            print(f"Connected to the topic '{topic}'. Listening for events...\n")
+            print(f"Connected to the topic '{topic}'. Listening for events…\n")
 
             for line in response.iter_lines(decode_unicode=True):
                 if line.startswith("data:"):
@@ -86,9 +86,9 @@ def listen_to_http_event_stream(url, headers=None, params=None, topic="comment")
                     try:
                         # Attempt to parse the data as JSON
                         message = json.loads(data_line)
-                        print("Received JSON message:")
-                        print(message)
-                        # publish(create_status_content(message, topic))
+                        # print("Received JSON message:")
+                        # print(message)
+                        publish(create_status_content(message, topic))
                     except json.JSONDecodeError:
                         # Handle plain text messages
                         print(f"Received plain message: {data_line}")

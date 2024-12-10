@@ -25,14 +25,25 @@ finally:
     if not conf:
         raise Exception("No configuration file provided.")
 
+try:
+    # For Mastodon
+    api_base_url = conf.api_base_url
+    scopes = conf.scopes
+    app_name = conf.app_name
+    mastodon_clientcred = conf.mastodon_clientcred
+    mastodon_usercred = conf.mastodon_usercred
 
-api_base_url = conf.api_base_url
-scopes = conf.scopes
-app_name = conf.app_name
-mastodon_clientcred = conf.mastodon_clientcred
-mastodon_usercred = conf.mastodon_usercred
-mastodon_clientcred_push = conf.mastodon_clientcred_push
-mastodon_usercred_push = conf.mastodon_usercred_push
+    # For PyVulnerabilityLookup
+    vulnerability_lookup_base_url = conf.vulnerability_lookup_base_url
+    vulnerability_auth_token = conf.vulnerability_auth_token
+except AttributeError:
+    raise Exception("Missing configuration variable.")
 
-vulnerability_lookup_base_url = conf.vulnerability_lookup_base_url
-vulnerability_auth_token = conf.vulnerability_auth_token
+
+try:
+    # Optional second Mastodon account to publish status
+    mastodon_clientcred_push = conf.mastodon_clientcred_push
+    mastodon_usercred_push = conf.mastodon_usercred_push
+except AttributeError:
+    mastodon_clientcred_push = ""
+    mastodon_usercred_push = ""
