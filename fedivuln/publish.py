@@ -1,6 +1,5 @@
 import argparse
 import json
-from typing import Any
 from urllib.parse import urljoin
 
 import requests
@@ -35,19 +34,20 @@ TEMPLATES = {
 }
 
 
-def create_status_content(event_data: dict[str, Any], topic: str) -> str:
+def create_status_content(event_data: str, topic: str) -> str:
     """Generates a status update for posting based on the monitored topic."""
+    event_dict = json.loads(event_data)
     status = TEMPLATES.get(topic, "")
     match topic:
         case "vulnerability":
-            status = status.replace("<VULNID>", event_data["payload"]["vulnerability"])
+            status = status.replace("<VULNID>", event_dict["payload"]["vulnerability"])
         case "comment":
-            status = status.replace("<VULNID>", event_data["payload"]["vulnerability"])
+            status = status.replace("<VULNID>", event_dict["payload"]["vulnerability"])
         case "bundle":
-            status = status.replace("<BUNDLETITLE>", event_data["payload"]["name"])
+            status = status.replace("<BUNDLETITLE>", event_dict["payload"]["name"])
         case _:
             pass
-    status = status.replace("<LINK>", event_data["uri"])
+    status = status.replace("<LINK>", event_dict["uri"])
     return status
 
 
@@ -85,10 +85,10 @@ def listen_to_http_event_stream(url, headers=None, params=None, topic="comment")
                     data_line = line[5:].strip()
                     try:
                         # Attempt to parse the data as JSON
-                        message = json.loads(data_line)
+                        event_data = json.loads(data_line)
                         # print("Received JSON message:")
                         # print(message)
-                        publish(create_status_content(message, topic))
+                        publish(create_status_content(event_data, topic))
                     except json.JSONDecodeError:
                         # Handle plain text messages
                         print(f"Received plain message: {data_line}")
