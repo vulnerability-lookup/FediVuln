@@ -11,3 +11,14 @@ mastodon_usercred_push = "mastodon_usercred_push.secret"
 
 vulnerability_lookup_base_url = "https://vulnerability.circl.lu/"
 vulnerability_auth_token = ""
+
+
+# Templates used when publishing status
+templates = {
+    "vulnerability": "You can now share your thoughts on vulnerability "
+    "<VULNID> in Vulnerability-Lookup:\n<LINK>\n\n#VulnerabilityLookup #Vulnerability #Cybersecurity #bot",
+    "comment": "Vulnerability <VULNID> has received a comment on "
+    "Vulnerability-Lookup:\n\n<TITLE>\n<LINK>\n\n#VulnerabilityLookup #Vulnerability #Cybersecurity #bot",
+    "bundle": "A new bundle, <BUNDLETITLE>, has been published "
+    "on Vulnerability-Lookup:\n<LINK>\n\n#VulnerabilityLookup #Vulnerability #Cybersecurity #bot",
+}

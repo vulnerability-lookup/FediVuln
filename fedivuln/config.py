@@ -32,6 +32,7 @@ try:
     app_name = conf.app_name
     mastodon_clientcred = conf.mastodon_clientcred
     mastodon_usercred = conf.mastodon_usercred
+    templates = conf.templates
 
     # For PyVulnerabilityLookup
     vulnerability_lookup_base_url = conf.vulnerability_lookup_base_url

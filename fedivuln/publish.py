@@ -22,22 +22,10 @@ mastodon = Mastodon(
 )
 
 
-# ### Templates
-
-TEMPLATES = {
-    "vulnerability": "You can now share your thoughts on vulnerability "
-    "<VULNID> in Vulnerability-Lookup:\n<LINK>\n\n#VulnerabilityLookup #Vulnerability",
-    "comment": "Vulnerability <VULNID> has received a comment on "
-    "Vulnerability-Lookup:\n\n<TITLE>\n<LINK>\n\n#VulnerabilityLookup #Vulnerability",
-    "bundle": "A new bundle, <BUNDLETITLE>, has been published "
-    "on Vulnerability-Lookup:\n<LINK>\n\n#VulnerabilityLookup #Vulnerability",
-}
-
-
 def create_status_content(event_data: str, topic: str) -> str:
     """Generates a status update for posting based on the monitored topic."""
     event_dict = json.loads(event_data)
-    status = TEMPLATES.get(topic, "")
+    status = config.templates.get(topic, "")
     match topic:
         case "vulnerability":
             status = status.replace("<VULNID>", event_dict["payload"]["vulnerability"])
