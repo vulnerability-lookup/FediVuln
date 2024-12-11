@@ -28,7 +28,7 @@ TEMPLATES = {
     "vulnerability": "You can now share your thoughts on vulnerability "
     "<VULNID> in Vulnerability-Lookup:\n<LINK>\n\n#VulnerabilityLookup #Vulnerability",
     "comment": "Vulnerability <VULNID> has received a comment on "
-    "Vulnerability-Lookup:\n<LINK>\n\n#VulnerabilityLookup #Vulnerability",
+    "Vulnerability-Lookup:\n\n<TITLE>\n<LINK>\n\n#VulnerabilityLookup #Vulnerability",
     "bundle": "A new bundle, <BUNDLETITLE>, has been published "
     "on Vulnerability-Lookup:\n<LINK>\n\n#VulnerabilityLookup #Vulnerability",
 }
@@ -43,6 +43,7 @@ def create_status_content(event_data: str, topic: str) -> str:
             status = status.replace("<VULNID>", event_dict["payload"]["vulnerability"])
         case "comment":
             status = status.replace("<VULNID>", event_dict["payload"]["vulnerability"])
+            status = status.replace("<TITLE>", event_dict["payload"]["title"])
         case "bundle":
             status = status.replace("<BUNDLETITLE>", event_dict["payload"]["name"])
         case _:
