@@ -29,15 +29,40 @@ def create_status_content(event_data: str, topic: str) -> str:
     status = config.templates.get(topic, "")
     match topic:
         case "vulnerability":
-            status = status.replace("<VULNID>", event_dict["payload"]["vulnerability"])
+            try:  # CVE
+                status = status.replace("<VULNID>", event_dict["cveMetadata"]["cveId"])
+                status = status.replace(
+                    "<LINK>",
+                    f"https://vulnerability.circl.lu/vuln/{event_dict['cveMetadata']['cveId']}",
+                )
+            except Exception:
+                pass
+            try:  # GHSA, PySec
+                status = status.replace("<VULNID>", event_dict["id"])
+                status = status.replace(
+                    "<LINK>", f"https://vulnerability.circl.lu/vuln/{event_dict['id']}"
+                )
+            except Exception:
+                pass
+            try:  # CSAF
+                status = status.replace(
+                    "<VULNID>", event_dict["document"]["tracking"]["id"]
+                )
+                status = status.replace(
+                    "<LINK>",
+                    f"https://vulnerability.circl.lu/vuln/{event_dict['document']['tracking']['id']}",
+                )
+            except Exception:
+                return ""
         case "comment":
             status = status.replace("<VULNID>", event_dict["payload"]["vulnerability"])
             status = status.replace("<TITLE>", event_dict["payload"]["title"])
+            status = status.replace("<LINK>", event_dict["uri"])
         case "bundle":
             status = status.replace("<BUNDLETITLE>", event_dict["payload"]["name"])
+            status = status.replace("<LINK>", event_dict["uri"])
         case _:
             pass
-    status = status.replace("<LINK>", event_dict["uri"])
     return status
 
 
@@ -45,7 +70,8 @@ def create_status_content(event_data: str, topic: str) -> str:
 
 
 def publish(message: str) -> None:
-    mastodon.status_post(message)
+    if message:
+        mastodon.status_post(message)
 
 
 def listen_to_http_event_stream(url, headers=None, params=None, topic="comment"):
