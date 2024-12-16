@@ -3,6 +3,7 @@ import json
 from urllib.parse import urljoin
 
 import requests
+import valkey
 from mastodon import Mastodon
 
 from fedivuln import config
@@ -90,9 +91,41 @@ def listen_to_http_event_stream(url, headers=None, params=None, topic="comment")
         print(f"Unexpected error: {e}")
 
 
+def listen_to_valkey_stream(topic="comment"):
+    """Stream data from the Valkey Pub/Sub service."""
+    valkey_client = valkey.Valkey(
+        host=config.valkey_host,
+        port=config.valkey_port,
+        decode_responses=True,
+    ).pubsub()
+    try:
+        valkey_client.subscribe(topic)
+    except valkey.exceptions.ConnectionError:
+        return
+    try:
+        while True:
+            message = valkey_client.get_message(timeout=10)  # Timeout for listener
+            if message and message["type"] == "message":
+                # Send entire JSON object as a single `data:` line
+                json_message = json.dumps(message["data"])  # Ensure single-line JSON
+                yield f"{json_message}"
+    except GeneratorExit:
+        valkey_client.unsubscribe(topic)
+    except valkey.exceptions.ConnectionError:
+        return
+    finally:
+        valkey_client.close()
+
+
 def main():
     """Parsing of arguments."""
     parser = argparse.ArgumentParser(prog="FediVuln-Publish")
+    parser.add_argument(
+        "--valkey",
+        dest="valkey",
+        action="store_true",
+        help="Stream from Valkey instead of streaming for the HTTP event-stream.",
+    )
     parser.add_argument(
         "-t",
         "--topic",
@@ -104,10 +137,15 @@ def main():
 
     arguments = parser.parse_args()
 
-    combined = urljoin(config.vulnerability_lookup_base_url, "pubsub/subscribe/")
-    full_url = urljoin(combined, arguments.topic)
-    headers = {"X-API-KEY": config.vulnerability_auth_token}
-    listen_to_http_event_stream(full_url, headers=headers, topic=arguments.topic)
+    if arguments.valkey:
+        for elem in listen_to_valkey_stream(topic=arguments.topic):
+            event_data = json.loads(elem)
+            publish(create_status_content(event_data, arguments.topic))
+    else:
+        combined = urljoin(config.vulnerability_lookup_base_url, "pubsub/subscribe/")
+        full_url = urljoin(combined, arguments.topic)
+        headers = {"X-API-KEY": config.vulnerability_auth_token}
+        listen_to_http_event_stream(full_url, headers=headers, topic=arguments.topic)
 
 
 if __name__ == "__main__":

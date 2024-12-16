@@ -45,6 +45,9 @@ try:
     # Optional second Mastodon account to publish status
     mastodon_clientcred_push = conf.mastodon_clientcred_push
     mastodon_usercred_push = conf.mastodon_usercred_push
+
+    valkey_host = conf.valkey_host
+    valkey_port = conf.valkey_port
 except AttributeError:
     mastodon_clientcred_push = ""
     mastodon_usercred_push = ""

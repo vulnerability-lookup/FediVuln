@@ -114,33 +114,6 @@ def push_sighting_to_vulnerability_lookup(status_uri, vulnerability_ids):
             )
 
 
-# def push_status_to_vulnerability_lookup(status, vulnerability_ids):
-#     """Push the status to the Vulnerability Lookup instance."""
-#     print("Pushing status to Vulnerability Lookup…")
-#     headers_json = {
-#         "Content-Type": "application/json",
-#         "accept": "application/json",
-#         "X-API-KEY": f"{config.vulnerability_auth_token}",
-#     }
-#     # status = convert_datetime(status)
-#     json_payload = {"status": status, "vulnerability_ids": vulnerability_ids}
-#     json_string = json.dumps(json_payload, cls=DateTimeEncoder)
-#     try:
-#         r = requests.post(
-#             urllib.parse.urljoin(config.vulnerability_lookup_base_url, "status/"),
-#             data=json_string,
-#             headers=headers_json,
-#         )
-#         if r.status_code not in (200, 201):
-#             print(
-#                 f"Error when sending POST request to the Vulnerability Lookup server: {r.reason}"
-#             )
-#     except requests.exceptions.ConnectionError as e:
-#         print(
-#             f"Error when sending POST request to the Vulnerability Lookup server:\n{e}"
-#         )
-
-
 def main():
     parser = argparse.ArgumentParser(
         prog="FediVuln-Stream", description="Allows access to the streaming API."
