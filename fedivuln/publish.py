@@ -35,6 +35,7 @@ def create_status_content(event_data: str, topic: str) -> str:
                     "<LINK>",
                     f"https://vulnerability.circl.lu/vuln/{event_dict['cveMetadata']['cveId']}",
                 )
+                return status
             except Exception:
                 pass
             try:  # GHSA, PySec
@@ -42,6 +43,7 @@ def create_status_content(event_data: str, topic: str) -> str:
                 status = status.replace(
                     "<LINK>", f"https://vulnerability.circl.lu/vuln/{event_dict['id']}"
                 )
+                return status
             except Exception:
                 pass
             try:  # CSAF
@@ -52,6 +54,7 @@ def create_status_content(event_data: str, topic: str) -> str:
                     "<LINK>",
                     f"https://vulnerability.circl.lu/vuln/{event_dict['document']['tracking']['id']}",
                 )
+                return status
             except Exception:
                 return ""
         case "comment":
