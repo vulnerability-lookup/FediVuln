@@ -47,12 +47,13 @@ def create_status_content(event_data: str, topic: str) -> str:
             except Exception:
                 pass
             try:  # CSAF
+                try:
+                    vuln_id = event_dict["document"]["tracking"]["id"].replace(":", "_")
+                except Exception:
+                    vuln_id = event_dict["document"]["tracking"]["id"]
+                status = status.replace("<VULNID>", vuln_id)
                 status = status.replace(
-                    "<VULNID>", event_dict["document"]["tracking"]["id"]
-                )
-                status = status.replace(
-                    "<LINK>",
-                    f"https://vulnerability.circl.lu/vuln/{event_dict['document']['tracking']['id']}",
+                    "<LINK>", f"https://vulnerability.circl.lu/vuln/{vuln_id}"
                 )
                 return status
             except Exception:
@@ -74,7 +75,8 @@ def create_status_content(event_data: str, topic: str) -> str:
 
 def publish(message: str) -> None:
     if message:
-        mastodon.status_post(message)
+        print(message)
+        # mastodon.status_post(message)
 
 
 def listen_to_http_event_stream(url, headers=None, params=None, topic="comment"):
