@@ -75,7 +75,8 @@ def create_status_content(event_data: str, topic: str) -> str:
 
 def publish(message: str) -> None:
     if message:
-        mastodon.status_post(message)
+        print(message)
+        # mastodon.status_post(message)
 
 
 def listen_to_http_event_stream(url, headers=None, params=None, topic="comment"):
