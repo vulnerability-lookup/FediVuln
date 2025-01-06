@@ -2,7 +2,7 @@
 name = "FediVuln"
 version = "0.6.4"
 description = "A client to gather vulnerability-related information from the Fediverse."
-authors = ["Cédric Bonhomme <cedric@cedricbonhomme.org>"]
+authors = ["Cédric Bonhomme <cedric.bonhomme@circl.lu>"]
 license = "GPL-3.0-or-later"
 readme = "README.md"
 
