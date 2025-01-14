@@ -1,6 +1,5 @@
 import argparse
 import json
-import re
 import sys
 from datetime import datetime
 
@@ -28,17 +27,6 @@ mastodon = Mastodon(
 # Listener class for handling stream events
 class VulnStreamListener(StreamListener):
     def __init__(self, push_sighting: bool = False):
-        # Regular expression to match CVE, GHSA, and PySec IDs
-        self.vulnerability_pattern = re.compile(
-            r"\b(CVE-\d{4}-\d{4,})\b"  # CVE pattern
-            r"|\b(GHSA-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4})\b"  # GHSA pattern
-            r"|\b(PYSEC-\d{4}-\d{2,5})\b"  # PYSEC pattern
-            r"|\b(GSD-\d{4}-\d{4,5})\b"  # GSD pattern
-            r"|\b(wid-sec-w-\d{4}-\d{4})\b"  # CERT-Bund pattern
-            r"|\b(cisco-sa-\d{8}-[a-zA-Z0-9]+)\b"  # CISCO pattern
-            r"|\b(RHSA-\d{4}:\d{4})\b",  # RedHat pattern
-            re.IGNORECASE,
-        )
         self.push_sighting = push_sighting
 
     # When a new status (post) is received
@@ -48,7 +36,7 @@ class VulnStreamListener(StreamListener):
             print("Edit of a previous status. Ignoring.")
             return
         content = status["content"]
-        matches = self.vulnerability_pattern.findall(
+        matches = config.vulnerability_patterns.findall(
             content
         )  # Find all matches in the content
         # Flatten the list of tuples to get only non-empty matched strings

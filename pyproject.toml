@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "FediVuln"
-version = "0.6.4"
+version = "0.7.0"
 description = "A client to gather vulnerability-related information from the Fediverse."
 authors = ["Cédric Bonhomme <cedric.bonhomme@circl.lu>"]
 license = "GPL-3.0-or-later"

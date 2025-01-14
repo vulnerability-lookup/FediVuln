@@ -34,6 +34,8 @@ try:
     mastodon_usercred = conf.mastodon_usercred
     templates = conf.templates
 
+    vulnerability_patterns = conf.vulnerability_patterns
+
     # For PyVulnerabilityLookup
     vulnerability_lookup_base_url = conf.vulnerability_lookup_base_url
     vulnerability_auth_token = conf.vulnerability_auth_token
