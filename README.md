@@ -18,7 +18,7 @@ $ export FEDIVULN_CONFIG=~/.FediVuln/conf.py
 The configuration for FediVuln should be defined in a Python file (e.g., ``~/.FediVuln/conf.py``).
 You must then set an environment variable (``FEDIVULN_CONFIG``) with the full path to this file.
 
-You can have a look at [this example](https://github.com/CIRCL/FediVuln/blob/main/fedivuln/conf_sample.py) of configuration.
+You can have a look at [this example](https://github.com/vulnerability-lookup/FediVuln/blob/main/fedivuln/conf_sample.py) of configuration.
 
 
 ## Usage
@@ -73,7 +73,7 @@ $ FediVuln-Stream --public --push-sighting
 
 Using the ``--push-sighting`` argument, detected vulnerability IDs will be recorded in
 [Vulnerability Lookup](https://github.com/cve-search/vulnerability-lookup) as
-[sightings](https://vulnerability-lookup.readthedocs.io/en/latest/sightings.html).
+[sightings](https://www.vulnerability-lookup.org/documentation/sightings.html).
 
 
 ### Publishing
@@ -116,7 +116,7 @@ options:
 
 ## License
 
-[FediVuln](https://github.com/CIRCL/FediVuln) is licensed under
+[FediVuln](https://github.com/vulnerability-lookup/FediVuln) is licensed under
 [GNU General Public License version 3](https://www.gnu.org/licenses/gpl-3.0.html)
 
 ~~~
