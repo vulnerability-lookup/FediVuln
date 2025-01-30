@@ -86,7 +86,7 @@ usage: FediVuln-Publish [-h] [-t {vulnerability,comment,bundle,sighting}]
 
 options:
   -h, --help            show this help message and exit
-  -t, --topic {vulnerability,comment,bundle,sighting}
+  -t {vulnerability,comment,bundle,sighting}, --topic {vulnerability,comment,bundle,sighting}
                         The topic to subscribe to.
 ```
 
@@ -103,6 +103,7 @@ original comment on the Vulnerability-Lookup instance.
 ### Search
 
 ```bash
+$ FediVuln-Search --help
 usage: FediVuln-Search [-h] --query QUERY
 
 Allows you to search for users, tags and, when enabled, full text, by default within your own posts and those you have interacted with.

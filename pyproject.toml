@@ -1,16 +1,44 @@
-[tool.poetry]
+[build-system]
+requires = ["poetry-core>=2.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[project]
 name = "FediVuln"
 version = "0.8.0"
 description = "A client to gather vulnerability-related information from the Fediverse."
-authors = ["Cédric Bonhomme <cedric.bonhomme@circl.lu>"]
+authors = [
+    {name = "Cédric Bonhomme", email = "cedric.bonhomme@circl.lu"}
+]
 license = "GPL-3.0-or-later"
 readme = "README.md"
-
-homepage = "https://github.com/CIRCL/FediVuln"
-repository = "https://github.com/CIRCL/FediVuln"
-
 keywords = ["Vulnerability-Lookup", "Vulnerability", "CVE", "Fediverse", "Mastodon"]
+# classifieres is dynamic because we want to create Python classifiers automatically
+dynamic = ["classifiers"]
 
+requires-python = "^3.10"
+dependencies = [
+    "pyvulnerabilitylookup (>=2.2.0)",
+    "mastodon-py (>=1.8.1)",
+    "pyvulnerabilitylookup (>=2.1.0)",
+    "valkey (>=6.0.2)"
+]
+
+
+[project.urls]
+Homepage = "https://github.com/vulnerability-lookup/FediVuln"
+Repository = "https://github.com/vulnerability-lookup/FediVuln"
+
+
+[project.scripts]
+FediVuln-Register = "fedivuln.register:main"
+FediVuln-Stream = "fedivuln.stream:main"
+FediVuln-Search = "fedivuln.search:main"
+FediVuln-Publish = "fedivuln.publish:main"
+
+
+[tool.poetry]
+requires-poetry = ">=2.0"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
@@ -21,27 +49,14 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"
 ]
-
 include = [
     "README.md",
     "COPYING",
     "fedivuln/conf_sample.py",
 ]
 
-[tool.poetry.scripts]
-FediVuln-Register = "fedivuln.register:main"
-FediVuln-Stream = "fedivuln.stream:main"
-FediVuln-Search = "fedivuln.search:main"
-FediVuln-Publish = "fedivuln.publish:main"
-
-[tool.poetry.dependencies]
-python = "^3.10"
-mastodon-py = "^1.8.1"
-pyvulnerabilitylookup = "^2.1.0"
-valkey = "^6.0.2"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.13.0"
@@ -49,9 +64,10 @@ flake8 = "^6.0.0"
 pre-commit = "^4.0.1"
 types-requests = "^2.32.0.20241016"
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev]
+optional = true
+
 
 [tool.mypy]
 python_version = "3.13"
