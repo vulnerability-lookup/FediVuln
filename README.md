@@ -2,7 +2,7 @@
 
 A client to gather vulnerability-related information from the Fediverse.
 The collected data is then sent to the
-[Vulnerability-Lookup](https://github.com/cve-search/vulnerability-lookup) API as sightings.
+[Vulnerability-Lookup](https://github.com/vulnerability-lookup/vulnerability-lookup) API as sightings.
 
 
 ## Installation
@@ -72,7 +72,7 @@ $ FediVuln-Stream --public --push-sighting
 ```
 
 Using the ``--push-sighting`` argument, detected vulnerability IDs will be recorded in
-[Vulnerability Lookup](https://github.com/cve-search/vulnerability-lookup) as
+[Vulnerability Lookup](https://github.com/vulnerability-lookup/vulnerability-lookup) as
 [sightings](https://www.vulnerability-lookup.org/documentation/sightings.html).
 
 
