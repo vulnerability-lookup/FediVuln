@@ -16,7 +16,7 @@ keywords = ["Vulnerability-Lookup", "Vulnerability", "CVE", "Fediverse", "Mastod
 # classifieres is dynamic because we want to create Python classifiers automatically
 dynamic = ["classifiers"]
 
-requires-python = "^3.10"
+requires-python = ">=3.10,<4.0"
 dependencies = [
     "pyvulnerabilitylookup (>=2.2.0)",
     "mastodon-py (>=1.8.1)",
