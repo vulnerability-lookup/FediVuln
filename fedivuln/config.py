@@ -53,3 +53,12 @@ try:
 except AttributeError:
     mastodon_clientcred_push = ""
     mastodon_usercred_push = ""
+
+
+try:
+    heartbeat_enabled = True
+    valkey_host = conf.valkey_host
+    valkey_port = conf.valkey_port
+    expiration_period = conf.expiration_period
+except Exception:
+    heartbeat_enabled = False

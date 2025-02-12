@@ -7,6 +7,7 @@ from mastodon import Mastodon, StreamListener
 from pyvulnerabilitylookup import PyVulnerabilityLookup
 
 from fedivuln import config
+from fedivuln.utils import heartbeat
 
 
 # Custom encoder for datetime
@@ -70,6 +71,9 @@ class VulnStreamListener(StreamListener):
     # Handle any errors in streaming
     def on_abort(self, err):
         print("Stream aborted with error:", err)
+
+    def handle_heartbeat(self):
+        heartbeat(process_name="process_FediVuln-Stream_heartbeat")
 
 
 def remove_case_insensitive_duplicates(input_list):

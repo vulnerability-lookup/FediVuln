@@ -47,3 +47,10 @@ vulnerability_auth_token = ""
 # Choice 2: Stream from the Valkey Pub/Sub streaming service (--valkey option):
 valkey_host = "127.0.0.1"
 valkey_port = 10002
+
+
+# Hearbeat mechanism
+heartbeat_enabled = True
+valkey_host = "127.0.0.1"
+valkey_port = 10002
+expiration_period = 3600

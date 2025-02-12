@@ -7,6 +7,7 @@ import valkey
 from mastodon import Mastodon
 
 from fedivuln import config
+from fedivuln.utils import heartbeat
 
 # Set up your Mastodon instance with access credentials
 if config.mastodon_clientcred_push and config.mastodon_usercred_push:
@@ -140,6 +141,7 @@ def listen_to_valkey_stream(topic="comment"):
                 # Send entire JSON object as a single `data:` line
                 json_message = json.dumps(message["data"])  # Ensure single-line JSON
                 yield f"{json_message}"
+            heartbeat(process_name=f"process_FediVuln-Publish_{topic}_heartbeat")
     except GeneratorExit:
         valkey_client.unsubscribe(topic)
     except valkey.exceptions.ConnectionError:
