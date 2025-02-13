@@ -7,7 +7,7 @@ from mastodon import Mastodon, StreamListener
 from pyvulnerabilitylookup import PyVulnerabilityLookup
 
 from fedivuln import config
-from fedivuln.utils import heartbeat
+from fedivuln.utils import heartbeat, report_error
 
 
 # Custom encoder for datetime
@@ -50,11 +50,11 @@ class VulnStreamListener(StreamListener):
             if self.push_sighting:
                 push_sighting_to_vulnerability_lookup(
                     status["uri"], vulnerability_ids
-                )  # Push the sighting to Vulnerability Lookup
+                )  # Push the sighting to Vulnerability-Lookup
             # if self.push_status:
             #     push_status_to_vulnerability_lookup(
             #         status, vulnerability_ids
-            #     )  # Push the status to Vulnerability Lookup
+            #     )  # Push the status to Vulnerability-Lookup
         else:
             print("No ID detected. Ignoring.")
 
@@ -71,9 +71,10 @@ class VulnStreamListener(StreamListener):
     # Handle any errors in streaming
     def on_abort(self, err):
         print("Stream aborted with error:", err)
+        report_error("error", f"Stream aborted with error: {err}")
 
     def handle_heartbeat(self):
-        heartbeat(process_name="process_FediVuln-Stream_heartbeat")
+        heartbeat(process_name="process_heartbeat_FediVuln")
 
 
 def remove_case_insensitive_duplicates(input_list):
@@ -86,8 +87,8 @@ def remove_case_insensitive_duplicates(input_list):
 
 
 def push_sighting_to_vulnerability_lookup(status_uri, vulnerability_ids):
-    """Create a sighting from an incoming status and push it to the Vulnerability Lookup instance."""
-    print("Pushing sighting to Vulnerability Lookup…")
+    """Create a sighting from an incoming status and push it to the Vulnerability-Lookup instance."""
+    print("Pushing sighting to Vulnerability-Lookup…")
     vuln_lookup = PyVulnerabilityLookup(
         config.vulnerability_lookup_base_url, token=config.vulnerability_auth_token
     )
@@ -95,14 +96,18 @@ def push_sighting_to_vulnerability_lookup(status_uri, vulnerability_ids):
         # Create the sighting
         sighting = {"type": "seen", "source": status_uri, "vulnerability": vuln}
 
-        # Post the JSON to Vulnerability Lookup
+        # Post the JSON to Vulnerability-Lookup
         try:
             r = vuln_lookup.create_sighting(sighting=sighting)
             if "message" in r:
                 print(r["message"])
         except Exception as e:
             print(
-                f"Error when sending POST request to the Vulnerability Lookup server:\n{e}"
+                f"Error when sending POST request to the Vulnerability-Lookup server:\n{e}"
+            )
+            report_error(
+                "error",
+                f"Error when sending POST request to the Vulnerability-Lookup server: {e}",
             )
 
 
@@ -123,12 +128,12 @@ def main():
     parser.add_argument(
         "--push-sighting",
         action="store_true",
-        help="Push the sightings to Vulnerability Lookup.",
+        help="Push the sightings to Vulnerability-Lookup.",
     )
     # parser.add_argument(
     #     "--push-status",
     #     action="store_true",
-    #     help="Push the status to Vulnerability Lookup.",
+    #     help="Push the status to Vulnerability-Lookup.",
     # )
 
     arguments = parser.parse_args()

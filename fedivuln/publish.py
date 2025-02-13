@@ -7,7 +7,7 @@ import valkey
 from mastodon import Mastodon
 
 from fedivuln import config
-from fedivuln.utils import heartbeat
+from fedivuln.utils import heartbeat, report_error
 
 # Set up your Mastodon instance with access credentials
 if config.mastodon_clientcred_push and config.mastodon_usercred_push:
@@ -117,10 +117,13 @@ def listen_to_http_event_stream(url, headers=None, params=None, topic="comment")
 
     except requests.exceptions.RequestException as req_err:
         print(f"Request error: {req_err}")
+        report_error("error", f"Request error with HTTP event stream: {req_err}")
     except KeyboardInterrupt:
         print("\nStream interrupted by user. Closing connection.")
+        report_error("error", "Stream interrupted by user. Closing connection.")
     except Exception as e:
         print(f"Unexpected error: {e}")
+        report_error("error", f"Unexpected error in listen_to_http_event_stream: {e}")
 
 
 def listen_to_valkey_stream(topic="comment"):
@@ -141,7 +144,7 @@ def listen_to_valkey_stream(topic="comment"):
                 # Send entire JSON object as a single `data:` line
                 json_message = json.dumps(message["data"])  # Ensure single-line JSON
                 yield f"{json_message}"
-            heartbeat(process_name=f"process_FediVuln-Publish_{topic}_heartbeat")
+            heartbeat(process_name=f"process_heartbeat_FediVuln-Publish_{topic}")
     except GeneratorExit:
         valkey_client.unsubscribe(topic)
     except valkey.exceptions.ConnectionError:
