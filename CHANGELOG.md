@@ -1,5 +1,10 @@
 # Changelog
 
+## Release 1.1.1 (2025-03-07)
+
+Only publish notifications about new vulnerabilities from CVE advisories.
+
+
 ## Release 1.1.0 (2025-03-07)
 
 Improvements to the publish module for the notifications about new vulnerabilities

@@ -51,39 +51,39 @@ def create_status_content(event_data: str, topic: str) -> str:
                 pass
 
             # GHSA, PySec
-            try:
-                if event_dict["published"] != event_dict["modified"]:
-                    return ""
-                status = status.replace("<VULNID>", event_dict["id"])
-                status = status.replace(
-                    "<LINK>", f"https://vulnerability.circl.lu/vuln/{event_dict['id']}"
-                )
-                status = status.replace("<VENDOR>", "")
-                status = status.replace("<PRODUCT>", "")
-                return status
-            except Exception:
-                pass
+            # try:
+            #     if event_dict["published"] != event_dict["modified"]:
+            #         return ""
+            #     status = status.replace("<VULNID>", event_dict["id"])
+            #     status = status.replace(
+            #         "<LINK>", f"https://vulnerability.circl.lu/vuln/{event_dict['id']}"
+            #     )
+            #     status = status.replace("<VENDOR>", "")
+            #     status = status.replace("<PRODUCT>", "")
+            #     return status
+            # except Exception:
+            #     pass
 
             # CSAF
-            try:
-                if (
-                    event_dict["document"]["tracking"]["initial_release_date"]
-                    != event_dict["document"]["tracking"]["current_release_date"]
-                ):
-                    return ""
-                try:
-                    vuln_id = event_dict["document"]["tracking"]["id"].replace(":", "_")
-                except Exception:
-                    vuln_id = event_dict["document"]["tracking"]["id"]
-                status = status.replace("<VULNID>", vuln_id)
-                status = status.replace(
-                    "<LINK>", f"https://vulnerability.circl.lu/vuln/{vuln_id}"
-                )
-                status = status.replace("<VENDOR>", "")
-                status = status.replace("<PRODUCT>", "")
-                return status
-            except Exception:
-                return ""
+            # try:
+            #     if (
+            #         event_dict["document"]["tracking"]["initial_release_date"]
+            #         != event_dict["document"]["tracking"]["current_release_date"]
+            #     ):
+            #         return ""
+            #     try:
+            #         vuln_id = event_dict["document"]["tracking"]["id"].replace(":", "_")
+            #     except Exception:
+            #         vuln_id = event_dict["document"]["tracking"]["id"]
+            #     status = status.replace("<VULNID>", vuln_id)
+            #     status = status.replace(
+            #         "<LINK>", f"https://vulnerability.circl.lu/vuln/{vuln_id}"
+            #     )
+            #     status = status.replace("<VENDOR>", "")
+            #     status = status.replace("<PRODUCT>", "")
+            #     return status
+            # except Exception:
+            #     return ""
         case "comment":
             status = status.replace("<VULNID>", event_dict["payload"]["vulnerability"])
             status = status.replace("<TITLE>", event_dict["payload"]["title"])
