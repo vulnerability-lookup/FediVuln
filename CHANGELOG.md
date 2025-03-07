@@ -1,5 +1,10 @@
 # Changelog
 
+## Release 1.1.2 (2025-03-07)
+
+Fixed an issue which caused the publication of a lot of useless posts.
+
+
 ## Release 1.1.1 (2025-03-07)
 
 Only publish notifications about new vulnerabilities from CVE advisories.
