@@ -48,7 +48,7 @@ def create_status_content(event_data: str, topic: str) -> str:
                 status = status.replace("<PRODUCT>", product)
                 return status
             except Exception:
-                pass
+                return ""
 
             # GHSA, PySec
             # try:
