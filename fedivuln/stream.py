@@ -7,7 +7,7 @@ from mastodon import Mastodon, StreamListener
 from pyvulnerabilitylookup import PyVulnerabilityLookup
 
 from fedivuln import config
-from fedivuln.utils import heartbeat, report_error
+from fedivuln.monitoring import heartbeat, log
 
 
 # Custom encoder for datetime
@@ -71,7 +71,7 @@ class VulnStreamListener(StreamListener):
     # Handle any errors in streaming
     def on_abort(self, err):
         print("Stream aborted with error:", err)
-        report_error("error", f"Stream aborted with error: {err}")
+        log("error", f"Stream aborted with error: {err}")
 
     def handle_heartbeat(self):
         heartbeat(process_name="process_heartbeat_FediVuln")
@@ -105,7 +105,7 @@ def push_sighting_to_vulnerability_lookup(status_uri, vulnerability_ids):
             print(
                 f"Error when sending POST request to the Vulnerability-Lookup server:\n{e}"
             )
-            report_error(
+            log(
                 "error",
                 f"Error when sending POST request to the Vulnerability-Lookup server: {e}",
             )

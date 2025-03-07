@@ -1,5 +1,11 @@
 # Changelog
 
+## Release 1.1.0 (2025-03-07)
+
+Improvements to the publish module for the notifications about new vulnerabilities
+on Mastodon.
+
+
 ## Release 1.0.0 (2025-02-13)
 
 This release introduces the capability to report errors, warnings,

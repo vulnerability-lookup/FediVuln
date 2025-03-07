@@ -7,7 +7,8 @@ import valkey
 from mastodon import Mastodon
 
 from fedivuln import config
-from fedivuln.utils import heartbeat, report_error
+from fedivuln.monitoring import heartbeat, log
+from fedivuln.utils import get_vendor_product_cve
 
 # Set up your Mastodon instance with access credentials
 if config.mastodon_clientcred_push and config.mastodon_usercred_push:
@@ -30,24 +31,46 @@ def create_status_content(event_data: str, topic: str) -> str:
     status = config.templates.get(topic, "")
     match topic:
         case "vulnerability":
-            try:  # CVE
+            # CVE
+            try:
+                if (
+                    event_dict["cveMetadata"]["datePublished"]
+                    != event_dict["cveMetadata"]["dateUpdated"]
+                ):
+                    return ""
+                vendor, product = get_vendor_product_cve(event_dict)[0]
                 status = status.replace("<VULNID>", event_dict["cveMetadata"]["cveId"])
                 status = status.replace(
                     "<LINK>",
                     f"https://vulnerability.circl.lu/vuln/{event_dict['cveMetadata']['cveId']}",
                 )
+                status = status.replace("<VENDOR>", vendor)
+                status = status.replace("<PRODUCT>", product)
                 return status
             except Exception:
                 pass
-            try:  # GHSA, PySec
+
+            # GHSA, PySec
+            try:
+                if event_dict["published"] != event_dict["modified"]:
+                    return ""
                 status = status.replace("<VULNID>", event_dict["id"])
                 status = status.replace(
                     "<LINK>", f"https://vulnerability.circl.lu/vuln/{event_dict['id']}"
                 )
+                status = status.replace("<VENDOR>", "")
+                status = status.replace("<PRODUCT>", "")
                 return status
             except Exception:
                 pass
-            try:  # CSAF
+
+            # CSAF
+            try:
+                if (
+                    event_dict["document"]["tracking"]["initial_release_date"]
+                    != event_dict["document"]["tracking"]["current_release_date"]
+                ):
+                    return ""
                 try:
                     vuln_id = event_dict["document"]["tracking"]["id"].replace(":", "_")
                 except Exception:
@@ -56,6 +79,8 @@ def create_status_content(event_data: str, topic: str) -> str:
                 status = status.replace(
                     "<LINK>", f"https://vulnerability.circl.lu/vuln/{vuln_id}"
                 )
+                status = status.replace("<VENDOR>", "")
+                status = status.replace("<PRODUCT>", "")
                 return status
             except Exception:
                 return ""
@@ -67,7 +92,7 @@ def create_status_content(event_data: str, topic: str) -> str:
             status = status.replace("<BUNDLETITLE>", event_dict["payload"]["name"])
             status = status.replace("<LINK>", event_dict["uri"])
         case _:
-            pass
+            status = ""
     return status
 
 
@@ -117,13 +142,13 @@ def listen_to_http_event_stream(url, headers=None, params=None, topic="comment")
 
     except requests.exceptions.RequestException as req_err:
         print(f"Request error: {req_err}")
-        report_error("error", f"Request error with HTTP event stream: {req_err}")
+        log("error", f"Request error with HTTP event stream: {req_err}")
     except KeyboardInterrupt:
         print("\nStream interrupted by user. Closing connection.")
-        report_error("error", "Stream interrupted by user. Closing connection.")
+        log("error", "Stream interrupted by user. Closing connection.")
     except Exception as e:
         print(f"Unexpected error: {e}")
-        report_error("error", f"Unexpected error in listen_to_http_event_stream: {e}")
+        log("error", f"Unexpected error in listen_to_http_event_stream: {e}")
 
 
 def listen_to_valkey_stream(topic="comment"):
