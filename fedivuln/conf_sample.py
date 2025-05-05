@@ -26,7 +26,7 @@ templates = {
 # Regular expression to match CVE, GHSA, and PySec IDs
 vulnerability_patterns = re.compile(
     r"\b(CVE-\d{4}-\d{4,})\b"  # CVE pattern
-    r"|\bGCVE-\d+-\d{4}-\d+\b"
+    r"|\b(GCVE-\d+-\d{4}-\d+)\b"
     r"|\b(GHSA-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4})\b"  # GHSA pattern
     r"|\b(PYSEC-\d{4}-\d{2,5})\b"  # PYSEC pattern
     r"|\b(GSD-\d{4}-\d{4,5})\b"  # GSD pattern
