@@ -21,6 +21,25 @@ You must then set an environment variable (``FEDIVULN_CONFIG``) with the full pa
 You can have a look at [this example](https://github.com/vulnerability-lookup/FediVuln/blob/main/fedivuln/conf_sample.py) of configuration.
 
 
+### With Docker
+
+```bash
+$ git clone https://github.com/vulnerability-lookup/FediVuln
+$ cd FediVuln
+
+# Make sure conf.py exists in the project root before running
+$ docker compose up --build
+```
+
+> [!NOTE]
+> Note: The docker-compose.yml expects a conf.py file in the root directory.
+> You can create it manually or copy the provided example:
+
+```bash
+cp fedivuln/conf_sample.py conf.py
+```
+
+
 ## Usage
 
 ### Register your application
