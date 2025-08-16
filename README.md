@@ -32,11 +32,11 @@ $ docker compose up --build
 ```
 
 > [!NOTE]
-> Note: The docker-compose.yml expects a conf.py file in the root directory.
+> The docker-compose.yml expects a conf.py file in the root directory.
 > You can create it manually or copy the provided example:
 > 
 > ```bash
-> cp fedivuln/conf_sample.py conf.py
+> $ cp fedivuln/conf_sample.py conf.py
 > ```
 
 
