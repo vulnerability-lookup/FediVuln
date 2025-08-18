@@ -24,11 +24,11 @@ You can have a look at [this example](https://github.com/vulnerability-lookup/Fe
 ### With Docker
 
 ```bash
-$ git clone https://github.com/vulnerability-lookup/FediVuln
-$ cd FediVuln
+git clone https://github.com/vulnerability-lookup/FediVuln
+cd FediVuln
 
 # Make sure conf.py exists in the project root before running
-$ docker compose up --build
+docker compose up --build
 ```
 
 > [!NOTE]
