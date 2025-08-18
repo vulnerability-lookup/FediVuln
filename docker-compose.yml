@@ -1,0 +1,17 @@
+name: "Fedivuln sighting client"
+
+services:
+
+  fedivuln-client:
+    image: vuln_lookup_fedivuln-client
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - APP_IMAGE=python:3.11-slim
+    restart: always
+    environment:
+      - PYTHONUNBUFFERED=TRUE
+      - FEDIVULN_CONFIG=/etc/conf.py
+    volumes:
+      - "./fedivuln/conf.py:/etc/conf.py"
