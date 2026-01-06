@@ -5,6 +5,7 @@ from urllib.parse import urljoin
 import requests
 import valkey
 from mastodon import Mastodon
+from mastodon.errors import MastodonAPIError
 
 from fedivuln import config
 from fedivuln.monitoring import heartbeat, log
@@ -102,7 +103,14 @@ def create_status_content(event_data: str, topic: str) -> str:
 def publish(message: str) -> None:
     if message:
         print(message)
-        mastodon.status_post(message)
+        try:
+            mastodon.status_post(message)
+        except MastodonAPIError as e:
+            print(
+                f"Mastodon instance returned MastodonAPIError - the server has decided it can't fulfil your request: {str(e)}"
+            )
+        except Exception as e:
+            print(e)
 
 
 def listen_to_http_event_stream(url, headers=None, params=None, topic="comment"):
