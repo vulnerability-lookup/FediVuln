@@ -63,11 +63,10 @@ def create_status_content(event_data: str, topic: str) -> str:
                     .replace("<LINK>", f"https://vulnerability.circl.lu/vuln/{cve_id}")
                     .replace("<VENDOR>", vendor)
                     .replace("<PRODUCT>", product)
-                    .replace("<DESCRIPTION>", "")
                 )
 
                 # Compute remaining space for the description
-                remaining = MAX_STATUS_LENGTH - len(status)
+                remaining = MAX_STATUS_LENGTH - len(status) + len("<DESCRIPTION>")
                 if remaining <= 0:
                     return ""
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## Release 1.2.1 (2026-01-06)
+
+Fixed the creation of the vulnerability status (the description was missing).
+
 ## Release 1.2.0 (2026-01-06)
 
 Improved the template for the vulnerability related posts.
