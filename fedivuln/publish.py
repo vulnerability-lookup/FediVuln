@@ -9,7 +9,7 @@ from mastodon.errors import MastodonAPIError
 
 from fedivuln import config
 from fedivuln.monitoring import heartbeat, log
-from fedivuln.utils import get_vendor_product_cve
+from fedivuln.utils import get_vendor_product_cve, truncate
 
 # Set up your Mastodon instance with access credentials
 if config.mastodon_clientcred_push and config.mastodon_usercred_push:
@@ -26,28 +26,56 @@ mastodon = Mastodon(
 )
 
 
+MAX_STATUS_LENGTH = 500
+
+
 def create_status_content(event_data: str, topic: str) -> str:
     """Generates a status update for posting based on the monitored topic."""
     event_dict = json.loads(event_data)
-    status = config.templates.get(topic, "")
+    status_template = config.templates.get(topic, "")
+
     match topic:
         case "vulnerability":
-            # CVE
             try:
                 if (
                     event_dict["cveMetadata"]["datePublished"]
                     != event_dict["cveMetadata"]["dateUpdated"]
                 ):
                     return ""
+
                 vendor, product = get_vendor_product_cve(event_dict)[0]
-                status = status.replace("<VULNID>", event_dict["cveMetadata"]["cveId"])
-                status = status.replace(
-                    "<LINK>",
-                    f"https://vulnerability.circl.lu/vuln/{event_dict['cveMetadata']['cveId']}",
+                cve_id = event_dict["cveMetadata"]["cveId"]
+
+                description = (
+                    event_dict.get("containers", {})
+                    .get("cna", {})
+                    .get("descriptions", [{}])[0]
+                    .get("value", "")
                 )
-                status = status.replace("<VENDOR>", vendor)
-                status = status.replace("<PRODUCT>", product)
+
+                # First build the status WITHOUT the description
+                status = (
+                    status_template.replace(
+                        "<PUBLISHED>", event_dict["cveMetadata"]["datePublished"]
+                    )
+                    .replace("<UPDATED>", event_dict["cveMetadata"]["dateUpdated"])
+                    .replace("<VULNID>", cve_id)
+                    .replace("<LINK>", f"https://vulnerability.circl.lu/vuln/{cve_id}")
+                    .replace("<VENDOR>", vendor)
+                    .replace("<PRODUCT>", product)
+                    .replace("<DESCRIPTION>", "")
+                )
+
+                # Compute remaining space for the description
+                remaining = MAX_STATUS_LENGTH - len(status)
+                if remaining <= 0:
+                    return ""
+
+                description = truncate(description, remaining)
+                status = status.replace("<DESCRIPTION>", description)
+
                 return status
+
             except Exception:
                 return ""
 

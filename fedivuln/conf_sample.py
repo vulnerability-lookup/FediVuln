@@ -15,13 +15,19 @@ mastodon_usercred_push = ""
 
 # Templates used when publishing status
 templates = {
-    "vulnerability": "You can now share your thoughts on vulnerability "
-    "<VULNID> in Vulnerability-Lookup:\n<LINK>\n\n<VENDOR> - <PRODUCT>\n\n#VulnerabilityLookup #Vulnerability #Cybersecurity #bot",
+    "vulnerability": "🚨 <VULNID>\n\n"
+    "📦️ Product: <PRODUCT>\n"
+    "🏢 Vendor: <VENDOR>\n"
+    "📅 Published: <PUBLISHED> | Updated: <UPDATED>\n\n"
+    "📝 <DESCRIPTION>\n\n"
+    "<LINK>\n\n"
+    "#VulnerabilityLookup #Vulnerability #Cybersecurity #bot",
     "comment": "Vulnerability <VULNID> has received a comment on "
     "Vulnerability-Lookup:\n\n<TITLE>\n<LINK>\n\n#VulnerabilityLookup #Vulnerability #Cybersecurity #bot",
     "bundle": "A new bundle, <BUNDLETITLE>, has been published "
     "on Vulnerability-Lookup:\n<LINK>\n\n#VulnerabilityLookup #Vulnerability #Cybersecurity #bot",
 }
+
 
 # Regular expression to match CVE, GHSA, and PySec IDs
 vulnerability_patterns = re.compile(
