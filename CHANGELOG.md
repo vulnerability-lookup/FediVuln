@@ -1,5 +1,11 @@
 # Changelog
 
+## Release 1.2.0 (2026-01-06)
+
+Improved the template for the vulnerability related posts.
+Handles Mastodon errors when the length of the status to post is too long.
+
+
 ## Release 1.1.2 (2025-03-07)
 
 Fixed an issue which caused the publication of a lot of useless posts.
