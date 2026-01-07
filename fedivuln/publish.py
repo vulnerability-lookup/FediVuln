@@ -1,6 +1,7 @@
 import argparse
 import asyncio
 import json
+from datetime import datetime
 from urllib.parse import urljoin
 
 import requests
@@ -68,11 +69,21 @@ async def create_status_content(event_data: str, topic: str) -> str:
                     .get("value", "")
                 )
 
+                # Parse ISO 8601 date string
+                published_raw = event_dict["cveMetadata"]["datePublished"]
+                try:
+                    published_dt = datetime.fromisoformat(
+                        published_raw.replace("Z", "+00:00")
+                    )
+                    # Format as YYYY-MM-DD HH:MM
+                    published_str = published_dt.strftime("%Y-%m-%d %H:%M")
+                except Exception:
+                    # Fallback: use raw string if parsing fails
+                    published_str = published_raw
+
                 # Build base status WITHOUT description or VLAI score
                 status = (
-                    status_template.replace(
-                        "<PUBLISHED>", event_dict["cveMetadata"]["datePublished"]
-                    )
+                    status_template.replace("<PUBLISHED>", published_str)
                     .replace("<VULNID>", cve_id)
                     .replace("<LINK>", f"https://vulnerability.circl.lu/vuln/{cve_id}")
                     .replace("<VENDOR>", vendor)

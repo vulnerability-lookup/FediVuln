@@ -1,5 +1,11 @@
 # Changelog
 
+## Release 1.3.3 (2026-01-08)
+
+Improved the display of the datePublished from cveMetadata.
+The format is now simply: %Y-%m-%d %H:%M 
+
+
 ## Release 1.3.2 (2026-01-08)
 
 Updated the vulnerability status generation.
