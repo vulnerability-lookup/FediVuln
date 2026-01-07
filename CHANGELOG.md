@@ -1,5 +1,9 @@
 # Changelog
 
+## Release 1.3.1 (2026-01-08)
+
+Added missing aiohttp dependency.
+
 ## Release 1.3.0 (2026-01-07)
 
 The VLAI score is now computed (remotely via an API call) and inserted in the status.
