@@ -1,5 +1,10 @@
 # Changelog
 
+## Release 1.3.2 (2026-01-08)
+
+Updated the vulnerability status generation.
+
+
 ## Release 1.3.1 (2026-01-08)
 
 Added missing aiohttp dependency.

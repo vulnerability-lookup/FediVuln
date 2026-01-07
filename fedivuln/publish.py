@@ -84,9 +84,7 @@ async def create_status_content(event_data: str, topic: str) -> str:
                 if description:
                     severity = await classify_vulnerability_severity(description)
                     if severity:
-                        vla_score_str = (
-                            f"{severity['severity']} ({severity['confidence']:.2f})"
-                        )
+                        vla_score_str = f"{severity['severity']} (confidence: {severity['confidence']:.2f})"
                     else:
                         vla_score_str = "N/A"
 
