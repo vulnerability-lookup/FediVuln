@@ -1,4 +1,5 @@
 import argparse
+import asyncio
 import json
 from urllib.parse import urljoin
 
@@ -9,7 +10,11 @@ from mastodon.errors import MastodonAPIError
 
 from fedivuln import config
 from fedivuln.monitoring import heartbeat, log
-from fedivuln.utils import get_vendor_product_cve, truncate
+from fedivuln.utils import (
+    classify_vulnerability_severity,
+    get_vendor_product_cve,
+    truncate,
+)
 
 # Set up your Mastodon instance with access credentials
 if config.mastodon_clientcred_push and config.mastodon_usercred_push:
@@ -29,14 +34,24 @@ mastodon = Mastodon(
 MAX_STATUS_LENGTH = 500
 
 
-def create_status_content(event_data: str, topic: str) -> str:
-    """Generates a status update for posting based on the monitored topic."""
+def create_status_content_sync(event_data: str, topic: str) -> str:
+    """Sync wrapper around async create_status_content()."""
+    return asyncio.run(create_status_content(event_data, topic))
+
+
+async def create_status_content(event_data: str, topic: str) -> str:
+    """Generates a status update for posting based on the monitored topic.
+
+    Async because it calls classify_vulnerability_severity.
+    Ensures the final status never exceeds MAX_STATUS_LENGTH.
+    """
     event_dict = json.loads(event_data)
     status_template = config.templates.get(topic, "")
 
     match topic:
         case "vulnerability":
             try:
+                # Skip if updated != published
                 if (
                     event_dict["cveMetadata"]["datePublished"]
                     != event_dict["cveMetadata"]["dateUpdated"]
@@ -53,74 +68,58 @@ def create_status_content(event_data: str, topic: str) -> str:
                     .get("value", "")
                 )
 
-                # First build the status WITHOUT the description
+                # Build base status WITHOUT description or VLAI score
                 status = (
                     status_template.replace(
                         "<PUBLISHED>", event_dict["cveMetadata"]["datePublished"]
                     )
-                    .replace("<UPDATED>", event_dict["cveMetadata"]["dateUpdated"])
                     .replace("<VULNID>", cve_id)
                     .replace("<LINK>", f"https://vulnerability.circl.lu/vuln/{cve_id}")
                     .replace("<VENDOR>", vendor)
                     .replace("<PRODUCT>", product)
                 )
 
-                # Compute remaining space for the description
+                # Compute VLAI score
+                vla_score_str = ""
+                if description:
+                    severity = await classify_vulnerability_severity(description)
+                    if severity:
+                        vla_score_str = (
+                            f"{severity['severity']} ({severity['confidence']:.2f})"
+                        )
+                    else:
+                        vla_score_str = "N/A"
+
+                status = status.replace("<VLAI-SCORE>", vla_score_str)
+
+                # Compute remaining space for description
                 remaining = MAX_STATUS_LENGTH - len(status) + len("<DESCRIPTION>")
                 if remaining <= 0:
                     return ""
 
+                # Truncate description to remaining space
                 description = truncate(description, remaining)
-                status = status.replace("<DESCRIPTION>", description)
+
+                # Insert description
+                status = status.replace("<DESCRIPTION>", description or "")
 
                 return status
 
             except Exception:
                 return ""
 
-            # GHSA, PySec
-            # try:
-            #     if event_dict["published"] != event_dict["modified"]:
-            #         return ""
-            #     status = status.replace("<VULNID>", event_dict["id"])
-            #     status = status.replace(
-            #         "<LINK>", f"https://vulnerability.circl.lu/vuln/{event_dict['id']}"
-            #     )
-            #     status = status.replace("<VENDOR>", "")
-            #     status = status.replace("<PRODUCT>", "")
-            #     return status
-            # except Exception:
-            #     pass
-
-            # CSAF
-            # try:
-            #     if (
-            #         event_dict["document"]["tracking"]["initial_release_date"]
-            #         != event_dict["document"]["tracking"]["current_release_date"]
-            #     ):
-            #         return ""
-            #     try:
-            #         vuln_id = event_dict["document"]["tracking"]["id"].replace(":", "_")
-            #     except Exception:
-            #         vuln_id = event_dict["document"]["tracking"]["id"]
-            #     status = status.replace("<VULNID>", vuln_id)
-            #     status = status.replace(
-            #         "<LINK>", f"https://vulnerability.circl.lu/vuln/{vuln_id}"
-            #     )
-            #     status = status.replace("<VENDOR>", "")
-            #     status = status.replace("<PRODUCT>", "")
-            #     return status
-            # except Exception:
-            #     return ""
         case "comment":
             status = status.replace("<VULNID>", event_dict["payload"]["vulnerability"])
             status = status.replace("<TITLE>", event_dict["payload"]["title"])
             status = status.replace("<LINK>", event_dict["uri"])
+
         case "bundle":
             status = status.replace("<BUNDLETITLE>", event_dict["payload"]["name"])
             status = status.replace("<LINK>", event_dict["uri"])
+
         case _:
             status = ""
+
     return status
 
 
@@ -170,7 +169,7 @@ def listen_to_http_event_stream(url, headers=None, params=None, topic="comment")
                         event_data = json.loads(data_line)
                         # print("Received JSON message:")
                         # print(message)
-                        publish(create_status_content(event_data, topic))
+                        publish(create_status_content_sync(event_data, topic))
                     except json.JSONDecodeError:
                         # Handle plain text messages
                         print(f"Received plain message: {data_line}")
@@ -236,7 +235,7 @@ def main():
     if arguments.valkey:
         for elem in listen_to_valkey_stream(topic=arguments.topic):
             event_data = json.loads(elem)
-            publish(create_status_content(event_data, arguments.topic))
+            publish(create_status_content_sync(event_data, arguments.topic))
     else:
         combined = urljoin(config.vulnerability_lookup_base_url, "pubsub/subscribe/")
         full_url = urljoin(combined, arguments.topic)

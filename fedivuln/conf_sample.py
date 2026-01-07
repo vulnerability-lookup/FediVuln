@@ -16,9 +16,10 @@ mastodon_usercred_push = ""
 # Templates used when publishing status
 templates = {
     "vulnerability": "🚨 <VULNID>\n\n"
+    "📊 VLAI Score: <VLAI-SCORE>\n"
     "📦️ Product: <PRODUCT>\n"
     "🏢 Vendor: <VENDOR>\n"
-    "📅 Published: <PUBLISHED> | Updated: <UPDATED>\n\n"
+    "📅 Published: <PUBLISHED>\n\n"
     "📝 <DESCRIPTION>\n\n"
     "<LINK>\n\n"
     "#VulnerabilityLookup #Vulnerability #Cybersecurity #bot",

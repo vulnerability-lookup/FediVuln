@@ -1,8 +1,14 @@
 # Changelog
 
+## Release 1.3.0 (2026-01-07)
+
+The VLAI score is now computed (remotely via an API call) and inserted in the status.
+
+
 ## Release 1.2.1 (2026-01-06)
 
 Fixed the creation of the vulnerability status (the description was missing).
+
 
 ## Release 1.2.0 (2026-01-06)
 
