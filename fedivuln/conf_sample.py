@@ -29,6 +29,14 @@ templates = {
     "on Vulnerability-Lookup:\n<LINK>\n\n#VulnerabilityLookup #Vulnerability #Cybersecurity #bot",
 }
 
+# The visibility of the status to posts is configarable per type of posts.
+status_visibility = {
+    "vulnerability": "unlisted",
+    "comment": "public",
+    "bundle": "public",
+    "sighting": "private",
+}
+
 
 # Regular expression to match CVE, GHSA, and PySec IDs
 vulnerability_patterns = re.compile(

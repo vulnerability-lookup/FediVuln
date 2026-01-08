@@ -135,11 +135,11 @@ async def create_status_content(event_data: str, topic: str) -> str:
 # ### Streaming functions
 
 
-def publish(message: str) -> None:
+def publish(message: str, visibility: str = "public") -> None:
     if message:
         print(message)
         try:
-            mastodon.status_post(message)
+            mastodon.status_post(message, visibility)
         except MastodonAPIError as e:
             print(
                 f"Mastodon instance returned MastodonAPIError - the server has decided it can't fulfil your request: {str(e)}"
@@ -178,7 +178,10 @@ def listen_to_http_event_stream(url, headers=None, params=None, topic="comment")
                         event_data = json.loads(data_line)
                         # print("Received JSON message:")
                         # print(message)
-                        publish(create_status_content_sync(event_data, topic))
+                        publish(
+                            create_status_content_sync(event_data, topic),
+                            config.status_visibility[topic],
+                        )
                     except json.JSONDecodeError:
                         # Handle plain text messages
                         print(f"Received plain message: {data_line}")
@@ -244,7 +247,10 @@ def main():
     if arguments.valkey:
         for elem in listen_to_valkey_stream(topic=arguments.topic):
             event_data = json.loads(elem)
-            publish(create_status_content_sync(event_data, arguments.topic))
+            publish(
+                create_status_content_sync(event_data, arguments.topic),
+                config.status_visibility[arguments.topic],
+            )
     else:
         combined = urljoin(config.vulnerability_lookup_base_url, "pubsub/subscribe/")
         full_url = urljoin(combined, arguments.topic)

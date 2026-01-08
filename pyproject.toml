@@ -5,7 +5,7 @@ build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "FediVuln"
-version = "1.3.3"
+version = "1.4.0"
 description = "A client to gather vulnerability-related information from the Fediverse."
 authors = [
     {name = "Cédric Bonhomme", email = "cedric.bonhomme@circl.lu"}

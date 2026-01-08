@@ -1,5 +1,11 @@
 # Changelog
 
+## Release 1.4.0 (2026-01-08)
+
+The visibility of the posts can now be configured via the configuration file (``fedivuln/conf.py``).  
+The value in the default configuration for the posts related to security advisories is set to ``unlisted``.
+
+
 ## Release 1.3.3 (2026-01-08)
 
 Improved the display of the datePublished from cveMetadata.

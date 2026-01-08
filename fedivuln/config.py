@@ -32,6 +32,7 @@ try:
     mastodon_clientcred = conf.mastodon_clientcred
     mastodon_usercred = conf.mastodon_usercred
     templates = conf.templates
+    status_visibility = conf.status_visibility
 
     vulnerability_patterns = conf.vulnerability_patterns
 
