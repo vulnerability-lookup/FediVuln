@@ -1,5 +1,10 @@
 # Changelog
 
+## Release 1.4.1 (2026-01-08)
+
+Fixed an issue when setting the visibility of the status to post.
+
+
 ## Release 1.4.0 (2026-01-08)
 
 The visibility of the posts can now be configured via the configuration file (``fedivuln/conf.py``).  

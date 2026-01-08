@@ -139,7 +139,7 @@ def publish(message: str, visibility: str = "public") -> None:
     if message:
         print(message)
         try:
-            mastodon.status_post(message, visibility)
+            mastodon.status_post(message, visibility=visibility)
         except MastodonAPIError as e:
             print(
                 f"Mastodon instance returned MastodonAPIError - the server has decided it can't fulfil your request: {str(e)}"
