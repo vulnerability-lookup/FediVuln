@@ -118,12 +118,18 @@ async def create_status_content(event_data: str, topic: str) -> str:
                 return ""
 
         case "comment":
-            status = status.replace("<VULNID>", event_dict["payload"]["vulnerability"])
-            status = status.replace("<TITLE>", event_dict["payload"]["title"])
-            status = status.replace("<LINK>", event_dict["uri"])
+            status = (
+                status_template.replace(
+                    "<VULNID>", event_dict["payload"]["vulnerability"]
+                )
+                .replace("<TITLE>", event_dict["payload"]["title"])
+                .replace("<LINK>", event_dict["uri"])
+            )
 
         case "bundle":
-            status = status.replace("<BUNDLETITLE>", event_dict["payload"]["name"])
+            status = status_template.replace(
+                "<BUNDLETITLE>", event_dict["payload"]["name"]
+            )
             status = status.replace("<LINK>", event_dict["uri"])
 
         case _:
