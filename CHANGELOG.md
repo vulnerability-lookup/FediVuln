@@ -1,5 +1,10 @@
 # Changelog
 
+## Release 1.4.2 (2026-01-23)
+
+Fixed an issue when building posts for comments and bundles.
+
+
 ## Release 1.4.1 (2026-01-08)
 
 Fixed an issue when setting the visibility of the status to post.
