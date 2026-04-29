@@ -1217,21 +1217,21 @@ testing = ["covdefaults (>=2.3)", "coverage (>=7.5.4)", "pytest (>=8.3.5)", "pyt
 
 [[package]]
 name = "pyvulnerabilitylookup"
-version = "2.19.0"
+version = "4.4.0"
 description = "Python CLI and module for Vulnerability Lookup"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "pyvulnerabilitylookup-2.19.0-py3-none-any.whl", hash = "sha256:42955989ef81645dafcfe9173375b130cfdbbc04253b51d629ff6a7c0b9d4146"},
-    {file = "pyvulnerabilitylookup-2.19.0.tar.gz", hash = "sha256:0a5aeaedc52266ef2c33b248ab13f3faee23113fd298d54a2772e503025383bd"},
+    {file = "pyvulnerabilitylookup-4.4.0-py3-none-any.whl", hash = "sha256:05df55d09a1c4b81fdabcb5ef97df09534ed7286910647627ab615ee7d102ca9"},
+    {file = "pyvulnerabilitylookup-4.4.0.tar.gz", hash = "sha256:cbcba50f96758239f3ddcd930a4e8c00256c3a78c3dbc8db81d5b73b34ed06a0"},
 ]
 
 [package.dependencies]
-requests = ">=2.32.5"
+requests = ">=2.33.1"
 
 [package.extras]
-docs = ["Sphinx (>=9.0.4) ; python_version >= \"3.11\""]
+docs = ["Sphinx (>=9.1) ; python_version >= \"3.12\""]
 
 [[package]]
 name = "pyyaml"
@@ -1638,4 +1638,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4.0"
-content-hash = "5fe640e1db3da46b2be529e740a121702fdf50f91e537bfdb19d995ead06d368"
+content-hash = "b4ab548a39decbbea482edc78e2fc74d8192ec1ffa742f1d558847472b70387e"
