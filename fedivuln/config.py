@@ -54,6 +54,8 @@ except AttributeError:
     mastodon_clientcred_push = ""
     mastodon_usercred_push = ""
 
+push_sighting_content = getattr(conf, "push_sighting_content", False)
+
 
 try:
     heartbeat_enabled = True

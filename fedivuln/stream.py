@@ -49,7 +49,9 @@ class VulnStreamListener(StreamListener):
             print("Vulnerability IDs detected:", ", ".join(vulnerability_ids))
             if self.push_sighting:
                 push_sighting_to_vulnerability_lookup(
-                    status["uri"], vulnerability_ids
+                    status["uri"],
+                    vulnerability_ids,
+                    content=content if config.push_sighting_content else None,
                 )  # Push the sighting to Vulnerability-Lookup
             # if self.push_status:
             #     push_status_to_vulnerability_lookup(
@@ -86,7 +88,7 @@ def remove_case_insensitive_duplicates(input_list):
     return list({item.lower(): item for item in input_list}.values())
 
 
-def push_sighting_to_vulnerability_lookup(status_uri, vulnerability_ids):
+def push_sighting_to_vulnerability_lookup(status_uri, vulnerability_ids, content=None):
     """Create a sighting from an incoming status and push it to the Vulnerability-Lookup instance."""
     print("Pushing sighting to Vulnerability-Lookup…")
     vuln_lookup = PyVulnerabilityLookup(
@@ -95,6 +97,8 @@ def push_sighting_to_vulnerability_lookup(status_uri, vulnerability_ids):
     for vuln in vulnerability_ids:
         # Create the sighting
         sighting = {"type": "seen", "source": status_uri, "vulnerability": vuln}
+        if content:
+            sighting["content"] = content
 
         # Post the JSON to Vulnerability-Lookup
         try:

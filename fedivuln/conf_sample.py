@@ -60,6 +60,10 @@ vulnerability_patterns = re.compile(
 vulnerability_lookup_base_url = "https://vulnerability.circl.lu/"
 vulnerability_auth_token = ""
 
+# When True, the content of the originating Mastodon status is included
+# in sightings pushed to Vulnerability-Lookup.
+push_sighting_content = False
+
 # Choice 2: Stream from the Valkey Pub/Sub streaming service (--valkey option):
 valkey_host = "127.0.0.1"
 valkey_port = 10002
