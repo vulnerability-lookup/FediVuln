@@ -1,5 +1,13 @@
 # Changelog
 
+## Release 1.5.0 (2026-04-29)
+
+The content of the originating Mastodon status can now optionally be included in
+sightings pushed to Vulnerability-Lookup. This behavior is controlled by the new
+``push_sighting_content`` configuration flag (disabled by default).
+Updated dependencies.
+
+
 ## Release 1.4.2 (2026-01-23)
 
 Fixed an issue when building posts for comments and bundles.
