@@ -1,5 +1,15 @@
 # Changelog
 
+## Release 1.5.1 (2026-10-09)
+
+The VLAI severity classification endpoint of Vulnerability-Lookup requires a
+credential since version 6.3 of the platform. FediVuln-Publish now sends the
+configured ``vulnerability_auth_token`` as ``X-API-KEY`` and derives the
+endpoint from ``vulnerability_lookup_base_url`` instead of a hard-coded URL.
+A failing classification request no longer drops the whole status: the score
+falls back to ``N/A`` and the error is reported in the monitoring logs.
+
+
 ## Release 1.5.0 (2026-04-29)
 
 The content of the originating Mastodon status can now optionally be included in

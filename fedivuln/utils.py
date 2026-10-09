@@ -1,6 +1,9 @@
 from typing import Any, Dict, Optional
+from urllib.parse import urljoin
 
 import aiohttp
+
+from fedivuln import config
 
 
 def get_vendor_product_cve(data):
@@ -24,10 +27,16 @@ async def classify_vulnerability_severity(
     Returns a dict like:
         {"severity": "High", "confidence": 0.8267}
 
+    The classification endpoint of Vulnerability-Lookup requires a credential
+    since version 6.3; the API token configured for the instance
+    (``vulnerability_auth_token``) is sent as ``X-API-KEY`` when set.
+
     Returns None if the request succeeds but no usable result is returned.
     Raises aiohttp.ClientError / asyncio.TimeoutError on errors.
     """
-    url = "https://vulnerability.circl.lu/api/vlai/severity-classification"
+    url = urljoin(
+        config.vulnerability_lookup_base_url, "api/vlai/severity-classification"
+    )
 
     payload = {"description": description}
 
@@ -35,6 +44,8 @@ async def classify_vulnerability_severity(
         "accept": "application/json",
         "Content-Type": "application/json",
     }
+    if config.vulnerability_auth_token:
+        headers["X-API-KEY"] = config.vulnerability_auth_token
 
     timeout = aiohttp.ClientTimeout(total=10)
 

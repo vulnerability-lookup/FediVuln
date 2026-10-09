@@ -93,7 +93,20 @@ async def create_status_content(event_data: str, topic: str) -> str:
                 # Compute VLAI score
                 vla_score_str = ""
                 if description:
-                    severity = await classify_vulnerability_severity(description)
+                    # The score is decoration: never let a failing or
+                    # unreachable classification endpoint drop the status.
+                    try:
+                        severity = await classify_vulnerability_severity(description)
+                    except Exception as e:
+                        print(f"VLAI classification failed for {cve_id}: {e}")
+                        try:
+                            log(
+                                "warning",
+                                f"VLAI classification failed for {cve_id}: {e}",
+                            )
+                        except Exception:
+                            pass
+                        severity = None
                     if severity:
                         vla_score_str = f"{severity['severity']} (confidence: {severity['confidence']:.2f})"
                     else:
@@ -148,7 +161,8 @@ def publish(message: str, visibility: str = "public") -> None:
             mastodon.status_post(message, visibility=visibility)
         except MastodonAPIError as e:
             print(
-                f"Mastodon instance returned MastodonAPIError - the server has decided it can't fulfil your request: {str(e)}"
+                "Mastodon instance returned MastodonAPIError - "
+                f"the server has decided it can't fulfil your request: {str(e)}"
             )
         except Exception as e:
             print(e)
