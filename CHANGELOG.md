@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+``FediVuln-Stream`` can subscribe over the WebSocket streaming API with the
+new ``--websocket`` option. Mastodon.py streams over a long-lived HTTP/1.1
+response, and some servers buffer those responses until a threshold is
+reached: a quiet home timeline then never gets through the read timeout and
+the stream reconnects forever. The WebSocket endpoint used by the web and
+mobile clients is not buffered. Events are dispatched to the same listener,
+so detection and sighting creation are unchanged.
+
+
 ## Release 1.5.1 (2026-10-09)
 
 The VLAI severity classification endpoint of Vulnerability-Lookup requires a

@@ -64,7 +64,7 @@ You only have to execute it once.
 ``FediVuln-Stream`` streams data from the Fediverse and uses PyVulnerabilityLookup to create sightings in Vulnerability-Lookup.
 
 ```bash
-usage: FediVuln-Stream [-h] [--user] [--public] [--push-sighting] [--push-status]
+usage: FediVuln-Stream [-h] [--user] [--public] [--push-sighting] [--websocket]
 
 Allows access to the streaming API.
 
@@ -72,8 +72,9 @@ options:
   -h, --help       show this help message and exit
   --user           Streams events that are relevant to the authorized user, i.e. home timeline and notifications.
   --public         Streams public events.
-  --push-sighting  Push the sightings to Vulnerability Lookup.
-  --push-status    Push the status to Vulnerability Lookup.
+  --push-sighting  Push the sightings to Vulnerability-Lookup.
+  --websocket      Use the WebSocket streaming API instead of HTTP streaming. Needed when the server buffers
+                   HTTP streaming responses, which delays or starves the stream.
 ```
 
 #### Examples
@@ -88,6 +89,16 @@ If you want to get the stream of public events (local server + connected servers
 
 ```bash
 $ FediVuln-Stream --public --push-sighting
+```
+
+If the stream connects but no events arrive, or it times out while connecting
+although the instance is up, the server is probably buffering HTTP streaming
+responses: nothing is sent until the buffer has filled, which a quiet home
+timeline never does. Add ``--websocket`` to subscribe over the WebSocket
+endpoint instead, which is not affected:
+
+```bash
+$ FediVuln-Stream --user --push-sighting --websocket
 ```
 
 Using the ``--push-sighting`` argument, detected vulnerability IDs will be recorded in

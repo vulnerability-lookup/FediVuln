@@ -1,9 +1,11 @@
 import argparse
+import asyncio
 import json
 import sys
 from datetime import datetime
 
-from mastodon import Mastodon, StreamListener
+import aiohttp
+from mastodon import Mastodon, MastodonNetworkError, StreamListener
 from pyvulnerabilitylookup import PyVulnerabilityLookup
 
 from fedivuln import config
@@ -115,6 +117,83 @@ def push_sighting_to_vulnerability_lookup(status_uri, vulnerability_ids, content
             )
 
 
+def streaming_websocket_url(stream: str) -> str:
+    """URL of the instance's WebSocket streaming endpoint for ``stream``."""
+    base = None
+    # v2 instance info, then v1, then assume the API host also streams.
+    try:
+        base = mastodon.instance()["configuration"]["urls"]["streaming"]
+    except (KeyError, TypeError, AttributeError):
+        pass
+    if not base:
+        try:
+            base = mastodon.instance_v1()["urls"]["streaming_api"]
+        except Exception:  # noqa: B902 - any failure means "not available"
+            pass
+    if not base:
+        base = mastodon.api_base_url.replace("https://", "wss://", 1).replace(
+            "http://", "ws://", 1
+        )
+    return f"{base.rstrip('/')}/api/v1/streaming?stream={stream}"
+
+
+def stream_websocket(listener: StreamListener, stream: str = "user") -> None:
+    """Stream events over the WebSocket API and hand them to ``listener``.
+
+    Mastodon.py streams over a long-lived HTTP/1.1 response. Some servers
+    buffer those responses, so nothing arrives until the buffer has filled: a
+    quiet home timeline then never gets through the read timeout and the
+    stream keeps reconnecting. The WebSocket endpoint, which the web and
+    mobile clients use, is not buffered. Events are dispatched through the
+    same path Mastodon.py uses, so the listener callbacks behave identically.
+    Returns only by raising, like Mastodon.py's stream_* methods.
+    """
+    url = streaming_websocket_url(stream)
+    headers = {}
+    if mastodon.access_token:
+        headers["Authorization"] = f"Bearer {mastodon.access_token}"
+
+    async def run() -> None:
+        # trust_env honours http(s)_proxy and no_proxy like the HTTP client.
+        async with aiohttp.ClientSession(trust_env=True) as session:
+            async with session.ws_connect(url, headers=headers, heartbeat=30) as ws:
+                while True:
+                    try:
+                        msg = await ws.receive(timeout=60)
+                    except asyncio.TimeoutError:
+                        # Quiet minute; the ping/pong heartbeat has kept the
+                        # socket checked, so the process is alive and idle.
+                        listener.handle_heartbeat()
+                        continue
+                    if msg.type == aiohttp.WSMsgType.TEXT:
+                        frame = json.loads(msg.data)
+                        listener._dispatch(
+                            {
+                                "event": frame["event"],
+                                "data": frame.get("payload", "null"),
+                                "stream": json.dumps(frame.get("stream")),
+                            }
+                        )
+                        listener.handle_heartbeat()
+                    elif msg.type in (
+                        aiohttp.WSMsgType.CLOSE,
+                        aiohttp.WSMsgType.CLOSING,
+                        aiohttp.WSMsgType.CLOSED,
+                        aiohttp.WSMsgType.ERROR,
+                    ):
+                        return
+
+    try:
+        asyncio.run(run())
+    except aiohttp.ClientError as err:
+        exception = MastodonNetworkError(f"WebSocket connection failed: {err}")
+        listener.on_abort(exception)
+        raise exception from err
+    exception = MastodonNetworkError("Server ceased communication.")
+    listener.on_abort(exception)
+    raise exception
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="FediVuln-Stream", description="Allows access to the streaming API."
@@ -134,6 +213,12 @@ def main():
         action="store_true",
         help="Push the sightings to Vulnerability-Lookup.",
     )
+    parser.add_argument(
+        "--websocket",
+        action="store_true",
+        help="Use the WebSocket streaming API instead of HTTP streaming. "
+        "Needed when the server buffers HTTP streaming responses, which delays or starves the stream.",
+    )
     # parser.add_argument(
     #     "--push-status",
     #     action="store_true",
@@ -145,7 +230,11 @@ def main():
     # Instantiate the listener
     listener = VulnStreamListener(push_sighting=arguments.push_sighting)
 
-    if arguments.user:
+    if arguments.websocket and (arguments.user or arguments.public):
+        stream = "user" if arguments.user else "public"
+        print(f"Starting Mastodon {stream} stream over WebSocket…")
+        stream_websocket(listener, stream)
+    elif arguments.user:
         print("Starting Mastodon user stream…")
         mastodon.stream_user(listener)
     elif arguments.public:
