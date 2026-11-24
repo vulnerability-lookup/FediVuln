@@ -3,6 +3,8 @@ import asyncio
 import json
 import sys
 from datetime import datetime
+from urllib.parse import urlparse
+from urllib.request import getproxies, proxy_bypass
 
 import aiohttp
 from mastodon import Mastodon, MastodonNetworkError, StreamListener
@@ -137,6 +139,19 @@ def streaming_websocket_url(stream: str) -> str:
     return f"{base.rstrip('/')}/api/v1/streaming?stream={stream}"
 
 
+def proxy_for_websocket(url: str):
+    """Proxy from the environment for a ws(s) URL.
+
+    aiohttp's trust_env looks up proxies by the URL's own scheme, so a wss://
+    URL would need a WSS_PROXY variable. Use the https/http proxy instead,
+    like the HTTP client does, and honour no_proxy.
+    """
+    parsed = urlparse(url)
+    if proxy_bypass(parsed.hostname or ""):
+        return None
+    return getproxies().get("https" if parsed.scheme == "wss" else "http")
+
+
 def stream_websocket(listener: StreamListener, stream: str = "user") -> None:
     """Stream events over the WebSocket API and hand them to ``listener``.
 
@@ -153,10 +168,13 @@ def stream_websocket(listener: StreamListener, stream: str = "user") -> None:
     if mastodon.access_token:
         headers["Authorization"] = f"Bearer {mastodon.access_token}"
 
+    proxy = proxy_for_websocket(url)
+
     async def run() -> None:
-        # trust_env honours http(s)_proxy and no_proxy like the HTTP client.
-        async with aiohttp.ClientSession(trust_env=True) as session:
-            async with session.ws_connect(url, headers=headers, heartbeat=30) as ws:
+        async with aiohttp.ClientSession() as session:
+            async with session.ws_connect(
+                url, headers=headers, heartbeat=30, proxy=proxy
+            ) as ws:
                 while True:
                     try:
                         msg = await ws.receive(timeout=60)
