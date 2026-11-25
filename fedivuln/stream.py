@@ -143,8 +143,11 @@ def streaming_websocket_url(stream: str) -> str:
         except not_available as err:
             print(f"Streaming URL not in v1 instance info: {err!r}")
     if not base:
-        base = mastodon.api_base_url.replace("https://", "wss://", 1).replace(
-            "http://", "ws://", 1
+        # Typed Optional, but always set: the client is built with a base URL.
+        base = (
+            (mastodon.api_base_url or "")
+            .replace("https://", "wss://", 1)
+            .replace("http://", "ws://", 1)
         )
     return f"{base.rstrip('/')}/api/v1/streaming?stream={stream}"
 
