@@ -2,20 +2,20 @@ ci:
   autoupdate_schedule: monthly
 repos:
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.19.0
+    rev: v3.22.0
     hooks:
       - id: pyupgrade
         args: ["--py37-plus"]
   - repo: https://github.com/PyCQA/isort
-    rev: 5.13.2
+    rev: 9.0.2
     hooks:
       - id: isort
   - repo: https://github.com/psf/black
-    rev: 24.10.0
+    rev: 26.10.1
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.1.1
+    rev: 7.5.0
     hooks:
       - id: flake8
         additional_dependencies:
@@ -23,14 +23,24 @@ repos:
           - flake8-implicit-str-concat
         args: ["--max-line-length=120"]
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: fix-byte-order-marker
       - id: trailing-whitespace
         exclude: .md
       - id: end-of-file-fixer
         exclude: tests/.*
-  - repo: https://github.com/pypa/pip-audit
-    rev: v2.7.3
+  # The upstream pip-audit hook audits the hook's own virtualenv (pip-audit's
+  # dependencies), not FediVuln's. Audit the locked dependencies instead.
+  - repo: local
     hooks:
-      -   id: pip-audit
+      - id: pip-audit
+        name: pip-audit (poetry.lock)
+        language: python
+        additional_dependencies: ["pip-audit==2.10.1"]
+        entry: >-
+          bash -c 'set -o pipefail;
+          poetry export --all-groups -f requirements.txt |
+          pip-audit --require-hashes --disable-pip --progress-spinner off -r /dev/stdin'
+        files: ^(pyproject\.toml|poetry\.lock)$
+        pass_filenames: false
