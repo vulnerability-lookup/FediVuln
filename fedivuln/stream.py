@@ -129,16 +129,19 @@ def push_sighting_to_vulnerability_lookup(status_uri, vulnerability_ids, content
 def streaming_websocket_url(stream: str) -> str:
     """URL of the instance's WebSocket streaming endpoint for ``stream``."""
     base = None
-    # v2 instance info, then v1, then assume the API host also streams.
+    # v2 instance info, then v1, then assume the API host also streams. A
+    # failed lookup (missing field, HTTP error, timeout) just moves on: if the
+    # instance is really down, connecting to the socket fails and is reported.
+    not_available = (MastodonError, KeyError, TypeError, AttributeError)
     try:
         base = mastodon.instance()["configuration"]["urls"]["streaming"]
-    except (KeyError, TypeError, AttributeError):
-        pass
+    except not_available as err:
+        print(f"Streaming URL not in instance info: {err!r}")
     if not base:
         try:
             base = mastodon.instance_v1()["urls"]["streaming_api"]
-        except Exception:  # noqa: B902 - any failure means "not available"
-            pass
+        except not_available as err:
+            print(f"Streaming URL not in v1 instance info: {err!r}")
     if not base:
         base = mastodon.api_base_url.replace("https://", "wss://", 1).replace(
             "http://", "ws://", 1
