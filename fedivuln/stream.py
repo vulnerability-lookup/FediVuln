@@ -7,7 +7,14 @@ from urllib.parse import urlparse
 from urllib.request import getproxies, proxy_bypass
 
 import aiohttp
-from mastodon import Mastodon, MastodonNetworkError, StreamListener
+from mastodon import (
+    Mastodon,
+    MastodonAPIError,
+    MastodonError,
+    MastodonMalformedEventError,
+    MastodonNetworkError,
+    StreamListener,
+)
 from pyvulnerabilitylookup import PyVulnerabilityLookup
 
 from fedivuln import config
@@ -152,6 +159,30 @@ def proxy_for_websocket(url: str):
     return getproxies().get("https" if parsed.scheme == "wss" else "http")
 
 
+def websocket_frame_to_event(data: str) -> dict:
+    """Turn a WebSocket text frame into the event dict ``_dispatch`` expects.
+
+    Raises MastodonAPIError for an ``{"error": ...}`` frame, which the server
+    sends e.g. for a rejected token or subscription, and
+    MastodonMalformedEventError for anything else that is not an event.
+    """
+    try:
+        frame = json.loads(data)
+    except ValueError as err:
+        raise MastodonMalformedEventError("Bad JSON", data) from err
+    if not isinstance(frame, dict):
+        raise MastodonMalformedEventError("Not an event", data)
+    if "error" in frame:
+        raise MastodonAPIError(f"Streaming server error: {frame['error']}")
+    if "event" not in frame:
+        raise MastodonMalformedEventError("Missing field", "event", frame)
+    return {
+        "event": frame["event"],
+        "data": frame.get("payload", "null"),
+        "stream": json.dumps(frame.get("stream")),
+    }
+
+
 def stream_websocket(listener: StreamListener, stream: str = "user") -> None:
     """Stream events over the WebSocket API and hand them to ``listener``.
 
@@ -162,6 +193,11 @@ def stream_websocket(listener: StreamListener, stream: str = "user") -> None:
     mobile clients use, is not buffered. Events are dispatched through the
     same path Mastodon.py uses, so the listener callbacks behave identically.
     Returns only by raising, like Mastodon.py's stream_* methods.
+
+    Reading and dispatching run as separate tasks joined by a queue. The
+    listener callbacks block (sighting pushes, Valkey calls), so they run in a
+    worker thread while the reader keeps calling ``ws.receive()``: pings are
+    answered and pongs seen however long a callback takes.
     """
     url = streaming_websocket_url(stream)
     headers = {}
@@ -170,46 +206,68 @@ def stream_websocket(listener: StreamListener, stream: str = "user") -> None:
 
     proxy = proxy_for_websocket(url)
 
+    # Queue items: an event dict to dispatch, IDLE for a quiet minute, or the
+    # MastodonError that ends the stream (queued after the events before it).
+    IDLE = None
+
+    async def read_frames(
+        ws: aiohttp.ClientWebSocketResponse, queue: asyncio.Queue
+    ) -> None:
+        try:
+            while True:
+                try:
+                    msg = await ws.receive(timeout=60)
+                except asyncio.TimeoutError:
+                    # Quiet minute; the ping/pong heartbeat has kept the
+                    # socket checked, so the process is alive and idle.
+                    queue.put_nowait(IDLE)
+                    continue
+                if msg.type == aiohttp.WSMsgType.TEXT:
+                    queue.put_nowait(websocket_frame_to_event(msg.data))
+                elif msg.type in (
+                    aiohttp.WSMsgType.CLOSE,
+                    aiohttp.WSMsgType.CLOSING,
+                    aiohttp.WSMsgType.CLOSED,
+                    aiohttp.WSMsgType.ERROR,
+                ):
+                    raise MastodonNetworkError("Server ceased communication.")
+        except MastodonError as err:
+            queue.put_nowait(err)
+        except aiohttp.ClientError as err:
+            queue.put_nowait(
+                MastodonNetworkError(f"WebSocket connection failed: {err}")
+            )
+
+    async def dispatch_events(queue: asyncio.Queue) -> None:
+        while True:
+            item = await queue.get()
+            if isinstance(item, MastodonError):
+                listener.on_abort(item)
+                raise item
+            if item is not IDLE:
+                # _dispatch reports malformed events through on_abort itself.
+                await asyncio.to_thread(listener._dispatch, item)
+            await asyncio.to_thread(listener.handle_heartbeat)
+
     async def run() -> None:
+        queue: asyncio.Queue = asyncio.Queue()
         async with aiohttp.ClientSession() as session:
             async with session.ws_connect(
                 url, headers=headers, heartbeat=30, proxy=proxy
             ) as ws:
-                while True:
-                    try:
-                        msg = await ws.receive(timeout=60)
-                    except asyncio.TimeoutError:
-                        # Quiet minute; the ping/pong heartbeat has kept the
-                        # socket checked, so the process is alive and idle.
-                        listener.handle_heartbeat()
-                        continue
-                    if msg.type == aiohttp.WSMsgType.TEXT:
-                        frame = json.loads(msg.data)
-                        listener._dispatch(
-                            {
-                                "event": frame["event"],
-                                "data": frame.get("payload", "null"),
-                                "stream": json.dumps(frame.get("stream")),
-                            }
-                        )
-                        listener.handle_heartbeat()
-                    elif msg.type in (
-                        aiohttp.WSMsgType.CLOSE,
-                        aiohttp.WSMsgType.CLOSING,
-                        aiohttp.WSMsgType.CLOSED,
-                        aiohttp.WSMsgType.ERROR,
-                    ):
-                        return
+                reader = asyncio.create_task(read_frames(ws, queue))
+                try:
+                    await dispatch_events(queue)
+                finally:
+                    reader.cancel()
 
     try:
         asyncio.run(run())
     except aiohttp.ClientError as err:
+        # Failed to connect: the reader never started.
         exception = MastodonNetworkError(f"WebSocket connection failed: {err}")
         listener.on_abort(exception)
         raise exception from err
-    exception = MastodonNetworkError("Server ceased communication.")
-    listener.on_abort(exception)
-    raise exception
 
 
 def main():
