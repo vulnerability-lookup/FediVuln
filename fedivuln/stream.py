@@ -179,9 +179,14 @@ def websocket_frame_to_event(data: str) -> dict:
         raise MastodonAPIError(f"Streaming server error: {frame['error']}")
     if "event" not in frame:
         raise MastodonMalformedEventError("Missing field", "event", frame)
+    payload = frame.get("payload", "null")
+    if not isinstance(payload, str):
+        # Mastodon sends the payload as a JSON string; some servers send the
+        # object itself. _dispatch expects the string form.
+        payload = json.dumps(payload)
     return {
         "event": frame["event"],
-        "data": frame.get("payload", "null"),
+        "data": payload,
         "stream": json.dumps(frame.get("stream")),
     }
 
@@ -235,13 +240,21 @@ def stream_websocket(listener: StreamListener, stream: str = "user") -> None:
                             f"Event backlog exceeded {MAX_BACKLOG}: dispatch is not keeping up."
                         )
                     queue.put_nowait(websocket_frame_to_event(msg.data))
+                elif msg.type == aiohttp.WSMsgType.ERROR:
+                    # msg.data is the exception, e.g. a pong timeout.
+                    raise MastodonNetworkError(
+                        f"WebSocket error: {msg.data!r}"
+                    ) from msg.data
                 elif msg.type in (
                     aiohttp.WSMsgType.CLOSE,
                     aiohttp.WSMsgType.CLOSING,
                     aiohttp.WSMsgType.CLOSED,
-                    aiohttp.WSMsgType.ERROR,
                 ):
-                    raise MastodonNetworkError("Server ceased communication.")
+                    reason = f" ({msg.extra})" if msg.extra else ""
+                    raise MastodonNetworkError(
+                        "Server ceased communication: "
+                        f"close code {ws.close_code}{reason}."
+                    )
         except MastodonError as err:
             queue.put_nowait(err)
         except aiohttp.ClientError as err:
