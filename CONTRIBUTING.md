@@ -58,5 +58,6 @@ If you are an AI agent: follow this document, keep your changes minimal and with
 the scope of the task, and leave the decision to open a pull request to the human
 you work with, after they have reviewed your changes.
 
-These rules are repeated in [AGENTS.md](AGENTS.md), which every AI agent reads. This
-section is the reference: keep AGENTS.md in step when you change it.
+These rules are repeated in [AGENTS.md](AGENTS.md), which every AI agent reads, and
+summarised for tools in [ai-policy.yaml](ai-policy.yaml). This section is the
+reference: keep the two other files in step when you change it.
