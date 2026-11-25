@@ -39,6 +39,11 @@ docker compose up --build
 > $ cp fedivuln/conf_sample.py conf.py
 > ```
 
+The container runs `FediVuln-Stream --public --push-sighting` by default. To
+pass other arguments, for example `--websocket`, set `command:` in
+`docker-compose.yml` (there is a commented example) or append them to
+`docker run <image>`.
+
 
 ## Usage
 
