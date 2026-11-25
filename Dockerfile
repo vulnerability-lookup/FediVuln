@@ -43,4 +43,7 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 
 RUN pipx install FediVuln
 
-ENTRYPOINT ["FediVuln-Stream", "--public", "--push-sighting"]
+ENTRYPOINT ["FediVuln-Stream"]
+# Default arguments; override them with `command:` in docker-compose.yml or
+# after the image name in `docker run`, e.g. to add --websocket.
+CMD ["--public", "--push-sighting"]

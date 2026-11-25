@@ -10,6 +10,9 @@ services:
       args:
         - APP_IMAGE=python:3.11-slim
     restart: always
+    # Arguments for FediVuln-Stream (the image default is --public --push-sighting).
+    # Add --websocket if the Mastodon server buffers HTTP streaming responses.
+    # command: ["--public", "--push-sighting", "--websocket"]
     environment:
       - PYTHONUNBUFFERED=TRUE
       - FEDIVULN_CONFIG=/etc/conf.py
