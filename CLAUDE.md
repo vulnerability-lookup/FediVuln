@@ -25,7 +25,7 @@ poetry build                       # build sdist + wheel
 
 There is **no test suite** in this repo — don't invent one or claim coverage. Manual smoke testing is done via the CLI entry points against a real Mastodon instance and a real Vulnerability-Lookup instance.
 
-Pre-commit chain: `pyupgrade --py37-plus`, `isort` (black profile), `black`, `flake8` (with `flake8-bugbear`, `flake8-implicit-str-concat`, max line 120), `pip-audit`. Match this — do not introduce a different formatter.
+Pre-commit chain: `pyupgrade --py37-plus`, `isort` (black profile), `black`, `flake8` (with `flake8-bugbear`, `flake8-implicit-str-concat`, max line 120), `pip-audit`. The `pip-audit` hook is a local one that audits `poetry.lock` (via `poetry export`, so `poetry` must be on `PATH`); it only runs when `pyproject.toml` or `poetry.lock` change — use `pre-commit run pip-audit --all-files` for a full audit. Match this — do not introduce a different formatter.
 
 ## Configuration model
 
