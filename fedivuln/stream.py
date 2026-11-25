@@ -212,6 +212,10 @@ def stream_websocket(listener: StreamListener, stream: str = "user") -> None:
     # Queue items: an event dict to dispatch, IDLE for a quiet minute, or the
     # MastodonError that ends the stream (queued after the events before it).
     IDLE = None
+    # Events waiting for the dispatcher. Past this, Vulnerability-Lookup is not
+    # keeping up: stop reading and end the stream rather than buffer without
+    # bound. (Blocking on a full queue would leave pings unanswered again.)
+    MAX_BACKLOG = 1000
 
     async def read_frames(
         ws: aiohttp.ClientWebSocketResponse, queue: asyncio.Queue
@@ -226,6 +230,10 @@ def stream_websocket(listener: StreamListener, stream: str = "user") -> None:
                     queue.put_nowait(IDLE)
                     continue
                 if msg.type == aiohttp.WSMsgType.TEXT:
+                    if queue.qsize() >= MAX_BACKLOG:
+                        raise MastodonNetworkError(
+                            f"Event backlog exceeded {MAX_BACKLOG}: dispatch is not keeping up."
+                        )
                     queue.put_nowait(websocket_frame_to_event(msg.data))
                 elif msg.type in (
                     aiohttp.WSMsgType.CLOSE,
