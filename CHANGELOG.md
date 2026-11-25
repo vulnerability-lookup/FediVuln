@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## Release 1.6.0 (2026-11-25)
 
 ``FediVuln-Stream`` can subscribe over the WebSocket streaming API with the
 new ``--websocket`` option. Mastodon.py streams over a long-lived HTTP/1.1
@@ -9,6 +9,21 @@ reached: a quiet home timeline then never gets through the read timeout and
 the stream reconnects forever. The WebSocket endpoint used by the web and
 mobile clients is not buffered. Events are dispatched to the same listener,
 so detection and sighting creation are unchanged.
+Error frames from the streaming server, failed connections and closed sockets
+are reported in the monitoring logs with their cause. Sighting pushes run
+outside the socket loop, so a slow Vulnerability-Lookup instance no longer
+drops the connection.
+
+The arguments of ``FediVuln-Stream`` in the Docker image can now be overridden,
+for example with ``command:`` in ``docker-compose.yml`` to add ``--websocket``.
+The default is unchanged (``--public --push-sighting``).
+
+Python 3.10, which reached its end of life, is no longer supported: FediVuln
+requires Python 3.11 or later.
+
+The project adopts the [AI transparency charter](https://www.saywhichai.org/charter.html):
+see the "Use of AI and LLM tools" section of ``CONTRIBUTING.md``.
+Updated dependencies.
 
 
 ## Release 1.5.1 (2026-10-09)
